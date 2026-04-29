@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,378 +8,413 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        *, *::before, *::after { box-sizing: border-box; }
+
+        :root {
+            --bg:     #090909;
+            --s1:     #111111;
+            --s2:     #181818;
+            --bd:     rgba(255,255,255,0.07);
+            --bd-a:   rgba(255,0,115,0.35);
+            --t1:     #ffffff;
+            --t2:     #888888;
+            --t3:     #555555;
+            --accent: #ff0073;
+            --adim:   rgba(255,0,115,0.12);
+            --aglow:  rgba(255,0,115,0.22);
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0F0C29 0%, #24243e 50%, #302b63 100%);
-            color: #ffffff;
+            background: var(--bg);
+            color: var(--t1);
+            min-height: 100vh;
         }
+
+        /* ── Noise grain overlay ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Navigation ── */
+        nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; }
+        .nav-inner {
+            padding: 1.25rem 1.5rem;
+            background: rgba(9,9,9,0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--bd);
+            transition: padding 0.3s;
+        }
+        .nav-inner.scrolled { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--t1);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+            transition: color 0.25s;
+        }
+        .logo span { color: var(--accent); }
+        .logo:hover { color: var(--accent); }
 
         .nav-link {
             position: relative;
-            transition: all 0.3s ease;
             font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--t2);
+            text-decoration: none;
+            transition: color 0.25s;
+            padding-bottom: 2px;
         }
-
         .nav-link::after {
             content: '';
             position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: 0;
-            left: 50%;
-            background: linear-gradient(90deg, #fc7ea2, #ffbace);
-            transition: all 0.3s ease;
-            transform: translateX(-50%);
+            bottom: -2px; left: 0;
+            width: 0; height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
             border-radius: 2px;
         }
+        .nav-link:hover { color: var(--t1); }
+        .nav-link:hover::after { width: 100%; }
 
-        .nav-link:hover::after {
-            width: 70%;
-        }
-
-        .nav-link:hover {
-            color: #fc7ea2;
-        }
-
-        .bgimg {
+        /* ── Accent blob ── */
+        .blob {
             position: fixed;
-            top: 0;
-            left: 0;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Page content ── */
+        .page-content { position: relative; z-index: 1; }
+
+        /* ── Section tag ── */
+        .section-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--s1);
+            border: 1px solid var(--bd);
+            border-radius: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+        }
+        .card:hover {
+            border-color: var(--bd-a);
+            box-shadow: 0 8px 40px var(--aglow);
+            transform: translateY(-2px);
+        }
+
+        /* ── Form elements ── */
+        .field-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--t2);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .field {
             width: 100%;
-            height: 100vh;
-            z-index: -1;
-            object-fit: cover;
-            object-position: 70% center;
-            filter: contrast(2) saturate(1.2) brightness(0.3);
+            padding: 0.85rem 1rem;
+            background: var(--s2);
+            border: 1px solid var(--bd);
+            border-radius: 10px;
+            color: var(--t1);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        .field::placeholder { color: var(--t3); }
+        .field:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--adim);
         }
 
-        @media screen and (max-width: 768px) {
-            body {
-                overflow-x: hidden;
-            }
+        /* ── Buttons ── */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.85rem 2rem;
+            background: var(--accent);
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
+            text-decoration: none;
+        }
+        .btn-primary:hover {
+            background: #cc005c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px var(--aglow);
+            color: #fff;
         }
 
-        .contact-form {
-            backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        /* ── Icon badge ── */
+        .icon-badge {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
         }
 
-        .contact-info {
-            backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        /* ── Social icon ── */
+        .social-btn {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--s2);
+            border: 1px solid var(--bd);
+            color: var(--t2);
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: border-color 0.25s, color 0.25s, transform 0.2s;
+        }
+        .social-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
         }
 
-        .animated-bg {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
+        /* ── Reveal ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
         }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
 
-        .animated-bg::before {
-            content: '';
-            position: absolute;
-            top: 25%;
-            left: 25%;
-            width: 384px;
-            height: 384px;
-            background: rgba(252, 126, 162, 0.1);
-            border-radius: 50%;
-            filter: blur(3rem);
-            animation: pulse 3s ease-in-out infinite;
-        }
+        /* ── Divider ── */
+        .divider { border: none; border-top: 1px solid var(--bd); }
 
-        .animated-bg::after {
-            content: '';
-            position: absolute;
-            bottom: 25%;
-            right: 25%;
-            width: 320px;
-            height: 320px;
-            background: rgba(139, 92, 246, 0.1);
-            border-radius: 50%;
-            filter: blur(3rem);
-            animation: pulse 3s ease-in-out infinite 1s;
-        }
+        /* ── Footer ── */
+        footer { background: var(--s1); border-top: 1px solid var(--bd); }
+        footer a { color: var(--t2); text-decoration: none; font-size: 0.875rem; transition: color 0.25s; }
+        footer a:hover { color: var(--accent); }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.1); }
-        }
+        /* mobile */
+        @media (max-width: 768px) { body { overflow-x: hidden; } }
     </style>
 </head>
-
 <body>
-    <!-- Background Image -->
-    <img src="assets/zero_two_rose.png" alt="Background" class="bgimg">
-    
-    <!-- Animated Background -->
-    <div class="animated-bg"></div>
+    <!-- Accent blobs -->
+    <div class="blob" style="width:500px;height:500px;top:-100px;left:-150px;background:rgba(255,0,115,0.07);"></div>
+    <div class="blob" style="width:400px;height:400px;bottom:-100px;right:-100px;background:rgba(255,0,115,0.05);"></div>
 
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-        <div class="nav-menu px-6 py-4 mx-auto transition-all duration-300 backdrop-blur-xl bg-white/10 border-b border-white/10">
-            <div class="container mx-auto flex justify-between items-center">
-                <!-- Logo -->
-                <a href="/" class="text-3xl font-black bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 text-transparent bg-clip-text hover:scale-105 transition-transform duration-300">
-                    Jason
-                </a>
+    <nav>
+        <div class="nav-inner" id="nav-inner">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <a href="/" class="logo">Jason<span>.</span></a>
 
-                <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="/" class="nav-link text-white hover:text-pink-400 transition-colors duration-300 relative group">
-                        Home
-                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-400 to-purple-400 group-hover:w-full transition-all duration-300"></span>
-                    </a>
-                    <a href="/#about" class="nav-link text-white hover:text-pink-400 transition-colors duration-300 relative group">
-                        About
-                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-400 to-purple-400 group-hover:w-full transition-all duration-300"></span>
-                    </a>
-                    <a href="/#projects" class="nav-link text-white hover:text-pink-400 transition-colors duration-300 relative group">
-                        Projects
-                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-400 to-purple-400 group-hover:w-full transition-all duration-300"></span>
-                    </a>
-                    <a href="./imprint" class="nav-link text-white hover:text-pink-400 transition-colors duration-300 relative group">
-                        Imprint
-                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-pink-400 to-purple-400 group-hover:w-full transition-all duration-300"></span>
-                    </a>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/#about" class="nav-link">About</a>
+                    <a href="/#projects" class="nav-link">Projects</a>
+                    <a href="./contact" class="nav-link" style="color:#fff;">Contact</a>
+                    <a href="./imprint" class="nav-link">Imprint</a>
                 </div>
 
-                <!-- Mobile Menu Button -->
-                <button id="mobile-menu-button" class="md:hidden flex items-center p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors duration-300">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path class="mobile-menu-icon" stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                <button id="mobile-menu-button" style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:0.5rem;cursor:pointer;" class="md:hidden">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path class="mobile-menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
                 </button>
             </div>
 
-            <!-- Mobile Menu -->
-            <div id="mobile-menu" class="md:hidden hidden transition-all duration-300 mt-4">
-                <div class="flex flex-col space-y-4 py-4 px-4 bg-black/20 rounded-2xl backdrop-blur-xl border border-white/10">
-                    <a href="/" class="nav-link text-white hover:text-pink-400 transition-colors duration-300 text-center py-2">Home</a>
-                    <a href="/#about" class="nav-link text-white hover:text-pink-400 transition-colors duration-300 text-center py-2">About</a>
-                    <a href="/#projects" class="nav-link text-white hover:text-pink-400 transition-colors duration-300 text-center py-2">Projects</a>
-                    <a href="./imprint" class="nav-link text-white hover:text-pink-400 transition-colors duration-300 text-center py-2">Imprint</a>
+            <div id="mobile-menu" class="hidden md:hidden mt-4">
+                <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:1rem;" class="flex flex-col gap-3">
+                    <a href="/" class="nav-link text-center py-1">Home</a>
+                    <a href="/#about" class="nav-link text-center py-1">About</a>
+                    <a href="/#projects" class="nav-link text-center py-1">Projects</a>
+                    <a href="./contact" class="nav-link text-center py-1" style="color:#fff;">Contact</a>
+                    <a href="./imprint" class="nav-link text-center py-1">Imprint</a>
                 </div>
             </div>
         </div>
     </nav>
 
     <script>
-        // Mobile Menu Toggle
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const navInner = document.getElementById('nav-inner');
+        window.addEventListener('scroll', () => {
+            navInner.classList.toggle('scrolled', window.scrollY > 40);
+        });
+        const mobileBtn = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
-
-        mobileMenuButton.addEventListener('click', () => {
+        mobileBtn.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
-            const icon = mobileMenuButton.querySelector('.mobile-menu-icon');
-            if (mobileMenu.classList.contains('hidden')) {
-                icon.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
-            } else {
-                icon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
-            }
+            const icon = mobileBtn.querySelector('.mobile-menu-icon');
+            icon.setAttribute('d', mobileMenu.classList.contains('hidden') ? 'M4 6h16M4 12h16M4 18h16' : 'M6 18L18 6M6 6l12 12');
         });
-
-        // Close mobile menu when clicking a link
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', () => {
-                if (!mobileMenu.classList.contains('hidden')) {
-                    mobileMenu.classList.add('hidden');
-                    mobileMenuButton.querySelector('.mobile-menu-icon').setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
-                }
-            });
-        });
+        document.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+            mobileBtn.querySelector('.mobile-menu-icon').setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
+        }));
     </script>
 
-    <!-- Contact Section -->
-    <section id="contact" class="relative min-h-screen py-32">
-        <div class="relative container mx-auto px-4">
-            <div class="text-center mb-20">
-                <h2 class="text-6xl font-black text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text mb-6">
-                    Contact Me
-                </h2>
-                <div class="w-32 h-1 bg-gradient-to-r from-pink-500 to-purple-600 mx-auto rounded-full mb-8"></div>
-                <p class="text-gray-300 text-xl max-w-2xl mx-auto leading-relaxed">
-                    Let's connect and create something amazing together
+    <!-- Main -->
+    <main class="page-content pt-32 pb-24">
+        <div class="max-w-6xl mx-auto px-4">
+
+            <!-- Heading -->
+            <div class="text-center mb-16 reveal">
+                <span class="section-tag">Get in touch</span>
+                <h1 style="font-size:clamp(2.5rem,6vw,4.5rem);font-weight:800;letter-spacing:-0.03em;line-height:1.1;" class="mb-4">
+                    Contact<span style="color:var(--accent);">.</span>
+                </h1>
+                <p style="color:var(--t2);font-size:1.1rem;max-width:480px;" class="mx-auto">
+                    Have a project in mind or just want to say hi? I'd love to hear from you.
                 </p>
             </div>
-            
-            <div class="flex flex-col lg:flex-row items-start gap-12 max-w-6xl mx-auto">
+
+            <!-- Grid -->
+            <div class="grid lg:grid-cols-5 gap-8 items-start">
+
                 <!-- Contact Form -->
-                <div class="lg:w-1/2 w-full">
-                    <div class="contact-form rounded-3xl p-8 shadow-2xl">
-                        <h3 class="text-2xl font-bold text-white mb-6">Send me a message</h3>
-                        <form action="https://formspree.io/f/xblgvqoe" method="POST" class="space-y-6">
-                            <div>
-                                <label for="name" class="block text-sm font-medium text-gray-200 mb-2">Name</label>
-                                <input type="text" id="name" name="name" required placeholder="Your name"
-                                    class="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all">
-                            </div>
-                            <div>
-                                <label for="email" class="block text-sm font-medium text-gray-200 mb-2">Email</label>
-                                <input type="email" id="email" name="email" required placeholder="your.email@example.com"
-                                    class="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all">
-                            </div>
-                            <div>
-                                <label for="message" class="block text-sm font-medium text-gray-200 mb-2">Message</label>
-                                <textarea id="message" name="message" rows="4" required placeholder="Tell me about your project or just say hello!"
-                                    class="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all resize-none"></textarea>
-                            </div>
-                            <button type="submit"
-                                class="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 px-6 rounded-xl hover:from-pink-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg font-medium">
-                                <span class="flex items-center justify-center">
-                                    Send Message
-                                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                                    </svg>
-                                </span>
-                            </button>
-                        </form>
-                    </div>
+                <div class="lg:col-span-3 card p-8 reveal" style="transition-delay:0.1s">
+                    <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:1.75rem;">Send a message</h2>
+                    <form action="https://formspree.io/f/xblgvqoe" method="POST" class="flex flex-col gap-5">
+                        <div>
+                            <label class="field-label" for="name">Name</label>
+                            <input type="text" id="name" name="name" required placeholder="Your name" class="field">
+                        </div>
+                        <div>
+                            <label class="field-label" for="email">Email</label>
+                            <input type="email" id="email" name="email" required placeholder="your.email@example.com" class="field">
+                        </div>
+                        <div>
+                            <label class="field-label" for="message">Message</label>
+                            <textarea id="message" name="message" rows="5" required placeholder="Tell me about your project or just say hello!" class="field" style="resize:none;"></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary w-full mt-2">
+                            Send Message
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                            </svg>
+                        </button>
+                    </form>
                 </div>
 
-                <!-- Contact Info -->
-                <div class="lg:w-1/2 w-full space-y-6">
-                    <!-- Email Card -->
-                    <div class="contact-info rounded-3xl p-6 shadow-xl">
-                        <div class="flex items-center mb-4">
-                            <div class="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center mr-4">
-                                <i class="fas fa-envelope text-white text-xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-bold text-white">Email</h3>
-                                <a href="mailto:jason@jesn.zip" class="text-pink-400 hover:text-pink-300 transition-colors">jason@jesn.zip</a>
-                            </div>
-                        </div>
-                        <p class="text-gray-300 text-sm">You can send me anything here, but please be patient - I will reply as soon as possible.</p>
-                    </div>
+                <!-- Info cards -->
+                <div class="lg:col-span-2 flex flex-col gap-5">
 
-                    <!-- Phone Card -->
-                    <div class="contact-info rounded-3xl p-6 shadow-xl">
-                        <div class="flex items-center mb-4">
-                            <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mr-4">
-                                <i class="fas fa-phone text-white text-xl"></i>
+                    <!-- Email -->
+                    <div class="card p-6 reveal" style="transition-delay:0.15s">
+                        <div class="flex items-start gap-4">
+                            <div class="icon-badge" style="background:var(--adim);">
+                                <i class="fas fa-envelope" style="color:var(--accent);"></i>
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold text-white">Phone</h3>
-                                <a href="tel:+4915901147061" class="text-green-400 hover:text-green-300 transition-colors">+49 159 01147061</a>
+                                <p style="font-weight:700;margin-bottom:0.25rem;">Email</p>
+                                <a href="mailto:jason@jesn.zip" style="color:var(--accent);font-size:0.9rem;">jason@jesn.zip</a>
+                                <p style="color:var(--t2);font-size:0.8rem;margin-top:0.4rem;">I'll reply as soon as possible.</p>
                             </div>
-                        </div>
-                        <p class="text-gray-300 text-sm">This number is for urgent inquiries only.</p>
-                    </div>
-
-                    <!-- Social Platforms Card -->
-                    <div class="contact-info rounded-3xl p-6 shadow-xl">
-                        <div class="flex items-center mb-4">
-                            <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center mr-4">
-                                <i class="fas fa-share-alt text-white text-xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-bold text-white">Social Platforms</h3>
-                                <p class="text-gray-300 text-sm">Connect with me on various platforms</p>
-                            </div>
-                        </div>
-                        <div class="flex space-x-4 mt-4">
-                            <a href="https://github.com/isanosaurus" target="_blank" rel="noopener noreferrer"
-                                class="group flex items-center justify-center w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-110">
-                                <i class="fab fa-github text-white text-xl group-hover:text-pink-400 transition-colors"></i>
-                            </a>
-                            <a href="https://tiktok.com/@deutscher775" target="_blank" rel="noopener noreferrer"
-                                class="group flex items-center justify-center w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-110">
-                                <i class="fab fa-tiktok text-white text-xl group-hover:text-purple-400 transition-colors"></i>
-                            </a>
-                            <a href="https://discordapp.com/users/690123872674119710" target="_blank" rel="noopener noreferrer"
-                                class="group flex items-center justify-center w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-110">
-                                <i class="fab fa-discord text-white text-xl group-hover:text-indigo-400 transition-colors"></i>
-                            </a>
                         </div>
                     </div>
 
-                    <!-- Quick Response Info -->
-                    <div class="contact-info rounded-3xl p-6 shadow-xl">
-                        <div class="flex items-center mb-4">
-                            <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mr-4">
-                                <i class="fas fa-clock text-white text-xl"></i>
+                    <!-- Phone -->
+                    <div class="card p-6 reveal" style="transition-delay:0.2s">
+                        <div class="flex items-start gap-4">
+                            <div class="icon-badge" style="background:rgba(34,197,94,0.1);">
+                                <i class="fas fa-phone" style="color:#22c55e;"></i>
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold text-white">Response Time</h3>
-                                <p class="text-orange-400">Usually within 24 hours</p>
+                                <p style="font-weight:700;margin-bottom:0.25rem;">Phone</p>
+                                <a href="tel:+4915901147061" style="color:#22c55e;font-size:0.9rem;">+49 159 01147061</a>
+                                <p style="color:var(--t2);font-size:0.8rem;margin-top:0.4rem;">For urgent inquiries only.</p>
                             </div>
                         </div>
-                        <p class="text-gray-300 text-sm">I try to respond to all messages as quickly as possible. For urgent matters, please call or mention it in your message.</p>
                     </div>
+
+                    <!-- Response time -->
+                    <div class="card p-6 reveal" style="transition-delay:0.25s">
+                        <div class="flex items-start gap-4">
+                            <div class="icon-badge" style="background:rgba(251,191,36,0.1);">
+                                <i class="fas fa-clock" style="color:#fbbf24;"></i>
+                            </div>
+                            <div>
+                                <p style="font-weight:700;margin-bottom:0.25rem;">Response Time</p>
+                                <p style="color:#fbbf24;font-size:0.9rem;">Usually within 24 hours</p>
+                                <p style="color:var(--t2);font-size:0.8rem;margin-top:0.4rem;">For urgent matters, mention it or call.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social -->
+                    <div class="card p-6 reveal" style="transition-delay:0.3s">
+                        <p style="font-weight:700;margin-bottom:1rem;">Find me on</p>
+                        <div class="flex gap-3">
+                            <a href="https://github.com/isanosaurus" target="_blank" rel="noopener noreferrer" class="social-btn" title="GitHub">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://tiktok.com/@deutscher775" target="_blank" rel="noopener noreferrer" class="social-btn" title="TikTok">
+                                <i class="fab fa-tiktok"></i>
+                            </a>
+                            <a href="https://discordapp.com/users/690123872674119710" target="_blank" rel="noopener noreferrer" class="social-btn" title="Discord">
+                                <i class="fab fa-discord"></i>
+                            </a>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
-    </section>
+    </main>
 
     <!-- Footer -->
-    <footer class="relative text-white py-20 overflow-hidden">
-        <!-- Background Effects -->
-        <div class="absolute inset-0">
-            <div class="absolute top-0 left-1/4 w-96 h-96 bg-pink-500/5 rounded-full blur-3xl"></div>
-            <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl"></div>
-        </div>
-        
-        <div class="relative container mx-auto px-4">
-            <div class="text-center">
-                <!-- Logo/Brand -->
-                <div class="mb-12">
-                    <h3 class="text-4xl font-black text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text mb-4">
-                        Jason
-                    </h3>
-                    <p class="text-gray-300 text-lg max-w-2xl mx-auto">
-                        Building the future, one line of code at a time
+    <footer class="py-10">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <a href="/" class="logo" style="font-size:1.3rem;">Jason<span>.</span></a>
+                    <p style="color:var(--t3);font-size:0.75rem;margin-top:0.25rem;">
+                        © <script>document.write(new Date().getFullYear())</script> Jason. Built with 💖
                     </p>
                 </div>
-
-                <!-- Social Links -->
-                <div class="flex justify-center space-x-8 mb-12">
-                    <a href="https://github.com/isanosaurus" target="_blank" rel="noopener noreferrer"
-                        class="group flex items-center justify-center w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-110">
-                        <svg class="w-8 h-8 text-white group-hover:text-pink-400 transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                        </svg>
-                    </a>
-                    <a href="https://discord.com/users/690123872674119710" target="_blank" rel="noopener noreferrer"
-                        class="group flex items-center justify-center w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-110">
-                        <svg class="w-8 h-8 text-white group-hover:text-purple-400 transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419-.0002 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1568 2.4189Z"/>
-                        </svg>
-                    </a>
-                    <a href="https://tiktok.com/deutscher775" target="_blank" rel="noopener noreferrer"
-                        class="group flex items-center justify-center w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-110">
-                        <svg class="w-8 h-8 text-white group-hover:text-indigo-400 transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-.88-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
-                        </svg>
-                    </a>
-                </div>
-
-                <!-- Bottom Bar -->
-                <div class="pt-8 border-t border-white/10">
-                    <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                        <div class="text-center md:text-left">
-                            <p class="text-gray-400 text-sm mb-2">
-                                © <script>document.write(new Date().getFullYear())</script> Jason. Made with 💖 and lots of Zero Two inspiration
-                            </p>
-                            <p class="text-gray-500 text-xs max-w-md mx-auto md:mx-0">
-                                The character "Zero Two" is from the anime "Darling in the FranXX" produced by CloverWorks.
-                            </p>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            <a href="./imprint" class="text-gray-400 hover:text-pink-400 transition-colors text-sm">Imprint</a>
-                            <span class="text-gray-600">•</span>
-                            <a href="/" class="text-gray-400 hover:text-pink-400 transition-colors text-sm">Home</a>
-                            <span class="text-gray-600">•</span>
-                            <a href="./sources" class="text-gray-400 hover:text-pink-400 transition-colors text-sm">Sources</a>
-                        </div>
-                    </div>
+                <div class="flex items-center gap-5">
+                    <a href="./imprint">Imprint</a>
+                    <a href="/">Home</a>
+                    <a href="./sources">Sources</a>
                 </div>
             </div>
         </div>
     </footer>
-</body>
 
+    <script>
+        // Scroll reveal
+        const revealObserver = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); } });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+    </script>
+</body>
 </html>
