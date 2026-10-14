@@ -1,460 +1,265 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sources - Isabella</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; }
-
-        :root {
-            --bg:     #090909;
-            --s1:     #111111;
-            --s2:     #181818;
-            --bd:     rgba(255,255,255,0.07);
-            --bd-a:   rgba(255,0,115,0.35);
-            --t1:     #ffffff;
-            --t2:     #888888;
-            --t3:     #555555;
-            --accent: #ff0073;
-            --adim:   rgba(255,0,115,0.12);
-            --aglow:  rgba(255,0,115,0.22);
-        }
-
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--t1); min-height: 100vh; }
-
-        nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; }
-        .nav-inner {
-            padding: 1.25rem 1.5rem;
-            background: rgba(9,9,9,0.88);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--bd);
-            transition: padding 0.3s;
-        }
-        .nav-inner.scrolled { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-
-        .logo { font-size: 1.6rem; font-weight: 800; color: var(--t1); text-decoration: none; letter-spacing: -0.02em; transition: color 0.25s; }
-        .logo span { color: var(--accent); }
-        .logo:hover { color: var(--accent); }
-
-        .nav-link { position: relative; font-weight: 500; font-size: 0.9rem; color: var(--t2); text-decoration: none; transition: color 0.25s; padding-bottom: 2px; }
-        .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: var(--accent); transition: width 0.3s ease; border-radius: 2px; }
-        .nav-link:hover { color: var(--t1); }
-        .nav-link:hover::after { width: 100%; }
-
-        .page-content { position: relative; z-index: 1; }
-
-        .section-tag { display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
-
-        /* Section block */
-        .section-card { background: var(--s1); border: 1px solid var(--bd); border-radius: 16px; padding: 2rem; }
-
-        .section-heading {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-        .section-heading-left { display: flex; align-items: center; gap: 0.75rem; }
-        .section-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--adim); display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 0.9rem; flex-shrink: 0; }
-        .section-heading h2 { font-size: 1.15rem; font-weight: 700; }
-
-        .count-badge {
-            font-size: 0.7rem; font-weight: 700;
-            padding: 0.2rem 0.6rem;
-            border-radius: 999px;
-            background: var(--adim);
-            color: var(--accent);
-            border: 1px solid rgba(255,0,115,0.2);
-        }
-
-        /* Source card */
-        .source-card {
-            background: var(--s2);
-            border: 1px solid var(--bd);
-            border-radius: 12px;
-            padding: 1.25rem;
-            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
-        }
-        .source-card:hover {
-            border-color: var(--bd-a);
-            box-shadow: 0 6px 24px var(--aglow);
-            transform: translateY(-3px);
-        }
-
-        /* Image wrap */
-        .img-wrap { position: relative; overflow: hidden; border-radius: 8px; }
-        .img-wrap img { transition: transform 0.4s ease; display: block; width: 100%; object-fit: cover; }
-        .img-wrap:hover img { transform: scale(1.06); }
-        .img-overlay {
-            position: absolute; inset: 0;
-            background: rgba(0,0,0,0);
-            display: flex; align-items: center; justify-content: center;
-            transition: background 0.3s;
-        }
-        .img-overlay i { opacity: 0; transition: opacity 0.3s; color: #fff; font-size: 1.2rem; }
-        .img-wrap:hover .img-overlay { background: rgba(0,0,0,0.4); }
-        .img-wrap:hover .img-overlay i { opacity: 1; }
-
-        /* Info row */
-        .info-row { font-size: 0.78rem; color: var(--t2); }
-        .info-row strong { color: var(--t1); font-weight: 600; }
-
-        /* Links */
-        a { color: var(--accent); text-decoration: none; transition: color 0.25s; }
-        a:hover { color: #ff2d8a; }
-
-        /* Cat pill */
-        .cat-pill {
-            display: inline-flex; align-items: center; gap: 0.35rem;
-            padding: 0.3rem 0.9rem;
-            border-radius: 999px;
-            font-size: 0.78rem; font-weight: 500;
-            background: var(--s2);
-            border: 1px solid var(--bd);
-            color: var(--t2);
-            text-decoration: none;
-            transition: border-color 0.25s, color 0.25s, background 0.25s;
-        }
-        .cat-pill:hover { border-color: var(--bd-a); color: var(--accent); background: var(--adim); }
-
-        /* Back to top */
-        #back-to-top {
-            position: fixed; bottom: 2rem; right: 2rem; z-index: 100;
-            width: 42px; height: 42px; border-radius: 50%;
-            background: var(--accent); border: none; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; transform: translateY(10px);
-            transition: opacity 0.3s, transform 0.3s, box-shadow 0.3s;
-            box-shadow: 0 4px 20px var(--aglow);
-        }
-        #back-to-top.show { opacity: 1; transform: translateY(0); }
-        #back-to-top:hover { box-shadow: 0 6px 28px var(--aglow); transform: translateY(-2px); }
-
-        /* Reveal */
-        .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
-        .reveal.visible { opacity: 1; transform: translateY(0); }
-
-        /* Footer */
-        footer { background: var(--s1); border-top: 1px solid var(--bd); }
-        footer a { color: var(--t2); text-decoration: none; font-size: 0.875rem; transition: color 0.25s; }
-        footer a:hover { color: var(--accent); }
-    </style>
-</head>
-<body>
-
-    <!-- Navigation -->
-    <nav>
-        <div class="nav-inner" id="nav-inner">
-            <div class="max-w-6xl mx-auto flex justify-between items-center">
-                <a href="/" class="logo">Isabella<span>.</span></a>
-                <div class="hidden md:flex items-center gap-8">
-                    <a href="/" class="nav-link">Home</a>
-                    <a href="/#about" class="nav-link">About</a>
-                    <a href="/#projects" class="nav-link">Projects</a>
-                    <a href="./contact" class="nav-link">Contact</a>
-                    <a href="./imprint" class="nav-link">Imprint</a>
-                </div>
-                <button id="mobile-menu-button" style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:0.5rem;cursor:pointer;" class="md:hidden">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path class="mobile-menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                </button>
-            </div>
-            <div id="mobile-menu" class="hidden md:hidden mt-4">
-                <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:1rem;" class="flex flex-col gap-3">
-                    <a href="/" class="nav-link text-center py-1">Home</a>
-                    <a href="/#about" class="nav-link text-center py-1">About</a>
-                    <a href="/#projects" class="nav-link text-center py-1">Projects</a>
-                    <a href="./contact" class="nav-link text-center py-1">Contact</a>
-                    <a href="./imprint" class="nav-link text-center py-1">Imprint</a>
-                </div>
-            </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sources — Isabella</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./out.css" />
+    <script>document.documentElement.classList.add("js");</script>
+  </head>
+  <!-- Icons: Font Awesome Free 6.4 by @fontawesome, https://fontawesome.com (CC BY 4.0) -->
+  <body>
+    <!-- Nav -->
+    <nav class="nav-strip" id="nav-strip">
+      <div class="max-w-6xl mx-auto flex justify-between items-center">
+        <a href="/" class="logo">Isabella<em>.</em></a>
+        <div class="hidden md:flex items-center gap-8">
+          <a href="/" class="nav-link">Home</a>
+          <a href="/#about" class="nav-link">About</a>
+          <a href="/#projects" class="nav-link">Projects</a>
+          <a href="./contact" class="nav-link">Contact</a>
+          <a href="./imprint" class="nav-link">Imprint</a>
         </div>
+        <button
+          id="mobile-menu-button"
+          class="md:hidden flex items-center justify-center icon-btn"
+          aria-label="Menu"
+          aria-controls="mobile-menu"
+          aria-expanded="false"
+        >
+          <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path class="mobile-menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+      <div id="mobile-menu" class="mt-4 md:hidden">
+        <div class="flex flex-col gap-3 p-4" style="background: var(--panel-2); border: 1px solid var(--seam)">
+          <a href="/" class="nav-link text-center">Home</a>
+          <a href="/#about" class="nav-link text-center">About</a>
+          <a href="/#projects" class="nav-link text-center">Projects</a>
+          <a href="./contact" class="nav-link text-center">Contact</a>
+          <a href="./imprint" class="nav-link text-center">Imprint</a>
+        </div>
+      </div>
     </nav>
 
-    <script>
-        const navInner = document.getElementById('nav-inner');
-        window.addEventListener('scroll', () => navInner.classList.toggle('scrolled', window.scrollY > 40));
-        const mobileBtn = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-        mobileBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-            const icon = mobileBtn.querySelector('.mobile-menu-icon');
-            icon.setAttribute('d', mobileMenu.classList.contains('hidden') ? 'M4 6h16M4 12h16M4 18h16' : 'M6 18L18 6M6 6l12 12');
-        });
-        document.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', () => {
-            mobileMenu.classList.add('hidden');
-            mobileBtn.querySelector('.mobile-menu-icon').setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
-        }));
-    </script>
-
     <!-- Back to top -->
-    <button id="back-to-top" aria-label="Back to top">
-        <i class="fas fa-arrow-up" style="color:#fff;font-size:0.85rem;"></i>
-    </button>
+    <button id="back-to-top" aria-label="Back to top"><svg class="icon" viewBox="0 0 384 512" style="width:0.75em" aria-hidden="true" focusable="false"><path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"/></svg></button>
 
-    <main class="page-content pt-32 pb-24">
-        <div class="max-w-6xl mx-auto px-4">
-
-            <!-- Heading -->
-            <div class="text-center mb-12 reveal">
-                <span class="section-tag">Transparency</span>
-                <h1 style="font-size:clamp(2.5rem,6vw,4.5rem);font-weight:800;letter-spacing:-0.03em;line-height:1.1;" class="mb-4">
-                    Image Sources<span style="color:var(--accent);">.</span>
-                </h1>
-                <p style="color:var(--t2);font-size:1rem;max-width:480px;" class="mx-auto">
-                    Credits and sources for all images used on this website.
-                </p>
-            </div>
-
-            <!-- Category nav -->
-            <div class="flex flex-wrap justify-center gap-3 mb-12 reveal" style="transition-delay:0.05s">
-                <a href="#info" class="cat-pill"><i class="fas fa-info-circle"></i> About</a>
-                <a href="#characters" class="cat-pill"><i class="fas fa-heart"></i> Characters</a>
-                <a href="#projects-assets" class="cat-pill"><i class="fas fa-code-branch"></i> Projects</a>
-                <a href="#social" class="cat-pill"><i class="fas fa-share-alt"></i> Social</a>
-                <a href="#copyright" class="cat-pill"><i class="fas fa-copyright"></i> Copyright</a>
-            </div>
-
-            <div class="flex flex-col gap-6">
-
-                <!-- Info -->
-                <div id="info" class="section-card reveal" style="transition-delay:0.1s">
-                    <div class="section-heading">
-                        <div class="section-heading-left">
-                            <div class="section-icon"><i class="fas fa-info-circle"></i></div>
-                            <h2>About Image Usage</h2>
-                        </div>
-                    </div>
-                    <p style="color:var(--t2);font-size:0.9rem;line-height:1.7;">
-                        All images used on this website are properly credited below. This page ensures proper attribution and compliance with licensing requirements. If you are the owner of any image and have concerns about its usage, please <a href="./contact">contact me</a>.
-                    </p>
-                </div>
-
-                <!-- Zero Two -->
-                <div id="characters" class="section-card reveal" style="transition-delay:0.15s">
-                    <div class="section-heading">
-                        <div class="section-heading-left">
-                            <div class="section-icon"><i class="fas fa-heart"></i></div>
-                            <h2>Zero Two Character Images</h2>
-                        </div>
-                        <span class="count-badge">4 images</span>
-                    </div>
-                    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="source-card">
-                            <div class="img-wrap mb-3" style="height:100px;">
-                                <img src="assets/zero_two_rose.png" alt="Zero Two Rose" style="height:100px;">
-                                <div class="img-overlay"><i class="fas fa-expand-alt"></i></div>
-                            </div>
-                            <p style="font-weight:600;font-size:0.9rem;margin-bottom:0.25rem;">Zero Two Rose</p>
-                            <p style="color:var(--t2);font-size:0.75rem;margin-bottom:0.5rem;">Background image across the website</p>
-                            <p class="info-row"><strong>Source:</strong> <a href="https://github.com/doki-theme/doki-theme-assets/blob/master/backgrounds/zero_two_rose.png">Doki Theme</a></p>
-                        </div>
-                        <div class="source-card">
-                            <div class="img-wrap mb-3" style="height:100px;">
-                                <img src="assets/zero_two_bg.png" alt="Zero Two Background" style="height:100px;">
-                                <div class="img-overlay"><i class="fas fa-expand-alt"></i></div>
-                            </div>
-                            <p style="font-weight:600;font-size:0.9rem;margin-bottom:0.25rem;">Zero Two Background</p>
-                            <p style="color:var(--t2);font-size:0.75rem;margin-bottom:0.5rem;">Used in about section</p>
-                            <p class="info-row"><strong>Source:</strong> Darling in the FranXX</p>
-                            <p class="info-row"><strong>Studio:</strong> CloverWorks</p>
-                        </div>
-                        <div class="source-card">
-                            <div class="img-wrap mb-3" style="height:100px;">
-                                <img src="assets/ZeroTwo_1.png" alt="Zero Two 1" style="height:100px;">
-                                <div class="img-overlay"><i class="fas fa-expand-alt"></i></div>
-                            </div>
-                            <p style="font-weight:600;font-size:0.9rem;margin-bottom:0.25rem;">Zero Two Portrait</p>
-                            <p style="color:var(--t2);font-size:0.75rem;margin-bottom:0.5rem;">Used for Discord bot project</p>
-                            <p class="info-row"><strong>Source:</strong> <a href="https://imgur.com/gallery/zero-two-banner-ptKzi62">adiskabruh on Imgur</a></p>
-                        </div>
-                        <div class="source-card">
-                            <div class="img-wrap mb-3" style="height:100px;">
-                                <img src="assets/ZeroTwo_2.jpg" alt="Zero Two 2" style="height:100px;">
-                                <div class="img-overlay"><i class="fas fa-expand-alt"></i></div>
-                            </div>
-                            <p style="font-weight:600;font-size:0.9rem;margin-bottom:0.25rem;">Zero Two Scene</p>
-                            <p style="color:var(--t2);font-size:0.75rem;margin-bottom:0.5rem;">Background overlay in projects</p>
-                            <p class="info-row"><strong>Source:</strong> <a href="https://de.pinterest.com/pin/774689573393994947/">𝑁𝑜𝑟𝑖 ☾︎ on Pinterest</a></p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project Logos -->
-                <div id="projects-assets" class="section-card reveal" style="transition-delay:0.2s">
-                    <div class="section-heading">
-                        <div class="section-heading-left">
-                            <div class="section-icon"><i class="fas fa-code-branch"></i></div>
-                            <h2>Project Logos &amp; Assets</h2>
-                        </div>
-                        <span class="count-badge">4 assets</span>
-                    </div>
-                    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="source-card">
-                            <div class="img-wrap mb-3" style="height:100px;background:var(--bg);display:flex;align-items:center;justify-content:center;">
-                                <img src="assets/Astroid-banner.png" alt="Astroid Banner" style="height:100px;object-fit:contain;padding:0.5rem;">
-                                <div class="img-overlay"><i class="fas fa-expand-alt"></i></div>
-                            </div>
-                            <p style="font-weight:600;font-size:0.9rem;margin-bottom:0.25rem;">Astroid Banner</p>
-                            <p style="color:var(--t2);font-size:0.75rem;margin-bottom:0.5rem;">Official Astroid project logo</p>
-                            <p class="info-row"><strong>Source:</strong> <a href="https://astroid.cc" target="_blank">astroid.cc</a></p>
-                            <p class="info-row"><strong>Owner:</strong> Astroid Dev Team</p>
-                        </div>
-                        <div class="source-card">
-                            <div class="img-wrap mb-3" style="height:100px;background:var(--bg);display:flex;align-items:center;justify-content:center;">
-                                <img src="assets/atomic.png" alt="atomicradio Logo" style="height:100px;object-fit:contain;padding:0.5rem;">
-                                <div class="img-overlay"><i class="fas fa-expand-alt"></i></div>
-                            </div>
-                            <p style="font-weight:600;font-size:0.9rem;margin-bottom:0.25rem;">atomicradio Logo</p>
-                            <p style="color:var(--t2);font-size:0.75rem;margin-bottom:0.5rem;">atomicradio branding</p>
-                            <p class="info-row"><strong>Source:</strong> <a href="https://atomic.radio" target="_blank">atomic.radio</a></p>
-                            <p class="info-row"><strong>Owner:</strong> Nabil Joumar</p>
-                        </div>
-                        <div class="source-card">
-                            <div class="img-wrap mb-3" style="height:100px;background:var(--bg);display:flex;align-items:center;justify-content:center;">
-                                <img src="assets/PyLeaf-logo.png" alt="PyLeaf Logo" style="height:100px;object-fit:contain;padding:0.5rem;">
-                                <div class="img-overlay"><i class="fas fa-expand-alt"></i></div>
-                            </div>
-                            <p style="font-weight:600;font-size:0.9rem;margin-bottom:0.25rem;">PyLeaf Logo</p>
-                            <p style="color:var(--t2);font-size:0.75rem;margin-bottom:0.5rem;">PyLeaf controller project logo</p>
-                            <p class="info-row"><strong>Source:</strong> Custom Design</p>
-                            <p class="info-row"><strong>Owner:</strong> Isabella Herrmann</p>
-                        </div>
-                        <div class="source-card">
-                            <div class="img-wrap mb-3" style="height:100px;background:var(--bg);display:flex;align-items:center;justify-content:center;">
-                                <img src="assets/presence-preview.png" alt="Presence Preview" style="height:100px;object-fit:contain;padding:0.5rem;">
-                                <div class="img-overlay"><i class="fas fa-expand-alt"></i></div>
-                            </div>
-                            <p style="font-weight:600;font-size:0.9rem;margin-bottom:0.25rem;">Presence API Preview</p>
-                            <p style="color:var(--t2);font-size:0.75rem;margin-bottom:0.5rem;">Screenshot of Presence API</p>
-                            <p class="info-row"><strong>Source:</strong> Screenshot</p>
-                            <p class="info-row"><strong>Owner:</strong> Isabella Herrmann</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Social Icons -->
-                <div id="social" class="section-card reveal" style="transition-delay:0.25s">
-                    <div class="section-heading">
-                        <div class="section-heading-left">
-                            <div class="section-icon"><i class="fas fa-share-alt"></i></div>
-                            <h2>Social Media &amp; Platform Icons</h2>
-                        </div>
-                        <span class="count-badge">4 icons</span>
-                    </div>
-                    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="source-card">
-                            <div class="img-wrap mb-3" style="height:72px;background:var(--bg);display:flex;align-items:center;justify-content:center;">
-                                <img src="assets/github-logo.svg" alt="GitHub" style="height:72px;object-fit:contain;padding:0.75rem;filter:invert(1);">
-                            </div>
-                            <p style="font-weight:600;font-size:0.9rem;margin-bottom:0.5rem;">GitHub</p>
-                            <p class="info-row"><strong>Source:</strong> <a href="https://github.com/logos">GitHub Brand Assets</a></p>
-                            <p class="info-row"><strong>License:</strong> Trademark Usage</p>
-                        </div>
-                        <div class="source-card">
-                            <div class="img-wrap mb-3" style="height:72px;background:var(--bg);display:flex;align-items:center;justify-content:center;">
-                                <img src="assets/discord-icon.svg" alt="Discord" style="height:72px;object-fit:contain;padding:0.75rem;">
-                            </div>
-                            <p style="font-weight:600;font-size:0.9rem;margin-bottom:0.5rem;">Discord</p>
-                            <p class="info-row"><strong>Source:</strong> <a href="https://discord.com/branding">Discord Brand Assets</a></p>
-                            <p class="info-row"><strong>License:</strong> Trademark Usage</p>
-                        </div>
-                        <div class="source-card">
-                            <div class="img-wrap mb-3" style="height:72px;background:var(--bg);display:flex;align-items:center;justify-content:center;">
-                                <img src="assets/tiktok-logo.png" alt="TikTok" style="height:72px;object-fit:contain;padding:0.75rem;">
-                            </div>
-                            <p style="font-weight:600;font-size:0.9rem;margin-bottom:0.5rem;">TikTok</p>
-                            <p class="info-row"><strong>Source:</strong> <a href="https://tiktokbrandhub.com/">TikTok Brand Assets</a></p>
-                            <p class="info-row"><strong>License:</strong> Trademark Usage</p>
-                        </div>
-                        <div class="source-card">
-                            <div class="img-wrap mb-3" style="height:72px;background:var(--bg);display:flex;align-items:center;justify-content:center;">
-                                <img src="assets/spotify-logo.svg" alt="Spotify" style="height:72px;object-fit:contain;padding:0.75rem;">
-                            </div>
-                            <p style="font-weight:600;font-size:0.9rem;margin-bottom:0.5rem;">Spotify</p>
-                            <p class="info-row"><strong>Source:</strong> <a href="https://developer.spotify.com/documentation/design">Spotify Brand Assets</a></p>
-                            <p class="info-row"><strong>License:</strong> Trademark Usage</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Copyright -->
-                <div id="copyright" class="section-card reveal" style="transition-delay:0.3s">
-                    <div class="section-heading">
-                        <div class="section-heading-left">
-                            <div class="section-icon"><i class="fas fa-copyright"></i></div>
-                            <h2>Copyright Notice</h2>
-                        </div>
-                    </div>
-                    <div class="grid md:grid-cols-3 gap-4 mb-6">
-                        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:1.25rem;">
-                            <p style="font-weight:700;font-size:0.85rem;margin-bottom:0.5rem;color:var(--t1);">Zero Two Character</p>
-                            <p style="color:var(--t2);font-size:0.8rem;line-height:1.6;">All Zero Two images are from "Darling in the FranXX" produced by CloverWorks. Used for fan art and educational purposes under fair use.</p>
-                        </div>
-                        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:1.25rem;">
-                            <p style="font-weight:700;font-size:0.85rem;margin-bottom:0.5rem;color:var(--t1);">Social Media Logos</p>
-                            <p style="color:var(--t2);font-size:0.8rem;line-height:1.6;">All social media platform logos are trademarks of their respective companies, used in accordance with their brand guidelines.</p>
-                        </div>
-                        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:1.25rem;">
-                            <p style="font-weight:700;font-size:0.85rem;margin-bottom:0.5rem;color:var(--t1);">Project Assets</p>
-                            <p style="color:var(--t2);font-size:0.8rem;line-height:1.6;">Project logos and custom graphics are my own work unless otherwise specified. Some assets may be used with permission.</p>
-                        </div>
-                    </div>
-                    <p style="color:var(--t3);font-size:0.8rem;text-align:center;">
-                        If you believe any content infringes on your copyright, please <a href="./contact">contact me</a> and I will address it promptly.
-                    </p>
-                </div>
-
-            </div>
+    <main class="pt-36 pb-24 px-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="section-head reveal mb-10">
+          <h1 class="mb-4">Image Sources<span style="color: var(--accent)">.</span></h1>
+          <p>Credits and sources for all images used on this website.</p>
         </div>
+
+        <nav aria-label="Sections" class="sources-nav flex flex-wrap gap-x-6 gap-y-2 mb-14 reveal text-sm" style="transition-delay: 0.05s">
+          <a href="#info">About</a>
+          <a href="#characters">Characters</a>
+          <a href="#projects-assets">Projects</a>
+          <a href="#social">Social</a>
+          <a href="#copyright">Copyright</a>
+        </nav>
+
+        <div class="flex flex-col gap-16">
+          <section id="info" class="reveal" style="transition-delay: 0.1s">
+            <h2 class="doc-title">About Image Usage</h2>
+            <p class="doc-text">
+              All images used on this website are properly credited below. This page ensures proper attribution and compliance with licensing requirements. If you are the owner of any image and have concerns about its usage, please <a href="./contact">contact me</a>.
+            </p>
+          </section>
+
+          <section id="characters" class="reveal" style="transition-delay: 0.15s">
+            <div class="section-row">
+              <h2 class="doc-title mb-0">Zero Two Character Images</h2>
+              <span class="doc-meta">4 images</span>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="panel panel--static source-card">
+                <div class="source-thumb"><img width="400" height="225" loading="lazy" decoding="async" src="assets/thumbs/zero_two_rose.webp" alt="Zero Two Rose" /></div>
+                <h3>Zero Two Rose</h3>
+                <p>Background image across the website</p>
+                <dl><dt>Source:</dt> <dd><a href="https://github.com/doki-theme/doki-theme-assets/blob/master/backgrounds/zero_two_rose.png">Doki Theme</a></dd></dl>
+              </div>
+              <div class="panel panel--static source-card">
+                <div class="source-thumb"><img width="400" height="169" loading="lazy" decoding="async" src="assets/thumbs/zero_two_bg.webp" alt="Zero Two Background" /></div>
+                <h3>Zero Two Background</h3>
+                <p>Used in about section</p>
+                <dl><dt>Source:</dt> <dd>Darling in the FranXX</dd><dt>Studio:</dt> <dd>CloverWorks</dd></dl>
+              </div>
+              <div class="panel panel--static source-card">
+                <div class="source-thumb"><img width="400" height="145" loading="lazy" decoding="async" src="assets/thumbs/ZeroTwo_1.webp" alt="Zero Two 1" /></div>
+                <h3>Zero Two Portrait</h3>
+                <p>Used for Discord bot project</p>
+                <dl><dt>Source:</dt> <dd><a href="https://imgur.com/gallery/zero-two-banner-ptKzi62">adiskabruh on Imgur</a></dd></dl>
+              </div>
+              <div class="panel panel--static source-card">
+                <div class="source-thumb"><img width="400" height="224" loading="lazy" decoding="async" src="assets/thumbs/ZeroTwo_2.webp" alt="Zero Two 2" /></div>
+                <h3>Zero Two Scene</h3>
+                <p>Background overlay in projects</p>
+                <dl><dt>Source:</dt> <dd><a href="https://de.pinterest.com/pin/774689573393994947/">𝑁𝑜𝑟𝑖 ☾︎ on Pinterest</a></dd></dl>
+              </div>
+            </div>
+          </section>
+
+          <section id="projects-assets" class="reveal" style="transition-delay: 0.2s">
+            <div class="section-row">
+              <h2 class="doc-title mb-0">Project Logos &amp; Assets</h2>
+              <span class="doc-meta">4 assets</span>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="panel panel--static source-card">
+                <div class="source-thumb"><img width="400" height="225" loading="lazy" decoding="async" src="assets/thumbs/Astroid-banner.webp" alt="Astroid Banner" /></div>
+                <h3>Astroid Banner</h3>
+                <p>Official Astroid project logo</p>
+                <dl><dt>Source:</dt> <dd><a href="https://astroid.cc" target="_blank" rel="noopener noreferrer">astroid.cc</a></dd><dt>Owner:</dt> <dd>Astroid Dev Team</dd></dl>
+              </div>
+              <div class="panel panel--static source-card">
+                <div class="source-thumb"><img width="192" height="192" loading="lazy" decoding="async" src="assets/atomic.png" alt="atomicradio Logo" /></div>
+                <h3>atomicradio Logo</h3>
+                <p>atomicradio branding</p>
+                <dl><dt>Source:</dt> <dd><a href="https://atomic.radio" target="_blank" rel="noopener noreferrer">atomic.radio</a></dd><dt>Owner:</dt> <dd>Nabil Joumar</dd></dl>
+              </div>
+              <div class="panel panel--static source-card">
+                <div class="source-thumb"><img width="504" height="504" loading="lazy" decoding="async" src="assets/PyLeaf-logo.png" alt="PyLeaf Logo" /></div>
+                <h3>PyLeaf Logo</h3>
+                <p>PyLeaf controller project logo</p>
+                <dl><dt>Source:</dt> <dd>Custom Design</dd><dt>Owner:</dt> <dd>Isabella Herrmann</dd></dl>
+              </div>
+              <div class="panel panel--static source-card">
+                <div class="source-thumb"><img width="900" height="173" loading="lazy" decoding="async" src="assets/thumbs/presence-preview.webp" alt="Presence Preview" /></div>
+                <h3>Presence API Preview</h3>
+                <p>Screenshot of Presence API</p>
+                <dl><dt>Source:</dt> <dd>Screenshot</dd><dt>Owner:</dt> <dd>Isabella Herrmann</dd></dl>
+              </div>
+            </div>
+          </section>
+
+          <section id="social" class="reveal" style="transition-delay: 0.25s">
+            <div class="section-row">
+              <h2 class="doc-title mb-0">Social Media &amp; Platform Icons</h2>
+              <span class="doc-meta">4 icons</span>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="panel panel--static source-card">
+                <div class="source-thumb source-thumb--icon"><img loading="lazy" decoding="async" src="assets/github-logo.svg" alt="GitHub" style="filter: invert(1)" /></div>
+                <h3>GitHub</h3>
+                <dl><dt>Source:</dt> <dd><a href="https://github.com/logos">GitHub Brand Assets</a></dd><dt>License:</dt> <dd>Trademark Usage</dd></dl>
+              </div>
+              <div class="panel panel--static source-card">
+                <div class="source-thumb source-thumb--icon"><img loading="lazy" decoding="async" src="assets/discord-icon.svg" alt="Discord" /></div>
+                <h3>Discord</h3>
+                <dl><dt>Source:</dt> <dd><a href="https://discord.com/branding">Discord Brand Assets</a></dd><dt>License:</dt> <dd>Trademark Usage</dd></dl>
+              </div>
+              <div class="panel panel--static source-card">
+                <div class="source-thumb source-thumb--icon"><img width="225" height="225" loading="lazy" decoding="async" src="assets/tiktok-logo.png" alt="TikTok" /></div>
+                <h3>TikTok</h3>
+                <dl><dt>Source:</dt> <dd><a href="https://tiktokbrandhub.com/">TikTok Brand Assets</a></dd><dt>License:</dt> <dd>Trademark Usage</dd></dl>
+              </div>
+              <div class="panel panel--static source-card">
+                <div class="source-thumb source-thumb--icon"><img width="150" height="150" loading="lazy" decoding="async" src="assets/spotify-logo.png" alt="Spotify" /></div>
+                <h3>Spotify</h3>
+                <dl><dt>Source:</dt> <dd><a href="https://developer.spotify.com/documentation/design">Spotify Brand Assets</a></dd><dt>License:</dt> <dd>Trademark Usage</dd></dl>
+              </div>
+            </div>
+          </section>
+
+          <section id="copyright" class="doc-panel reveal" style="transition-delay: 0.3s">
+            <h2 class="doc-title">Copyright Notice</h2>
+            <div class="grid md:grid-cols-3 gap-8 mt-6 mb-8">
+              <div>
+                <h3 class="font-semibold mb-2" style="color: var(--text-1)">Zero Two Character</h3>
+                <p class="doc-text">All Zero Two images are from "Darling in the FranXX" produced by CloverWorks. Used for fan art and educational purposes under fair use.</p>
+              </div>
+              <div>
+                <h3 class="font-semibold mb-2" style="color: var(--text-1)">Social Media Logos</h3>
+                <p class="doc-text">All social media platform logos are trademarks of their respective companies, used in accordance with their brand guidelines.</p>
+              </div>
+              <div>
+                <h3 class="font-semibold mb-2" style="color: var(--text-1)">Project Assets</h3>
+                <p class="doc-text">Project logos and custom graphics are my own work unless otherwise specified. Some assets may be used with permission.</p>
+              </div>
+            </div>
+            <div class="pt-6" style="border-top: 1px solid var(--seam)">
+              <p class="doc-text">
+                If you believe any content infringes on your copyright, please <a href="./contact">contact me</a> and I will address it promptly.
+              </p>
+            </div>
+          </section>
+        </div>
+      </div>
     </main>
 
     <!-- Footer -->
-    <footer class="py-10">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <div>
-                    <a href="/" class="logo" style="font-size:1.3rem;">Isabella<span>.</span></a>
-                    <p style="color:var(--t3);font-size:0.75rem;margin-top:0.25rem;">
-                        © <script>document.write(new Date().getFullYear())</script> Isabella. Built with 💖
-                    </p>
-                </div>
-                <div class="flex items-center gap-5">
-                    <a href="./contact">Contact</a>
-                    <a href="./imprint">Imprint</a>
-                    <a href="/">Home</a>
-                </div>
-            </div>
+    <footer class="footer-strip py-10 px-6">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+          <a href="/" class="logo" style="font-size: 1.1rem">Isabella<em>.</em></a>
+          <p class="text-xs mt-1" style="color: var(--text-3)">
+            © <span id="current-year"></span> Isabella. Built with 💖
+          </p>
         </div>
+        <div class="flex items-center gap-5">
+          <a href="./contact">Contact</a>
+          <a href="./imprint">Imprint</a>
+          <a href="/">Home</a>
+        </div>
+      </div>
     </footer>
 
     <script>
-        // Back to top
-        const btt = document.getElementById('back-to-top');
-        window.addEventListener('scroll', () => btt.classList.toggle('show', window.scrollY > 400));
-        btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+      const navStrip = document.getElementById("nav-strip");
+      window.addEventListener("scroll", () => navStrip.classList.toggle("is-scrolled", window.scrollY > 40));
+      const mobileBtn = document.getElementById("mobile-menu-button");
+      const mobileMenu = document.getElementById("mobile-menu");
+      mobileBtn.addEventListener("click", () => {
+        mobileMenu.classList.toggle("is-open");
+        mobileBtn.setAttribute("aria-expanded", mobileMenu.classList.contains("is-open"));
+        const icon = mobileBtn.querySelector(".mobile-menu-icon");
+        icon.setAttribute("d", mobileMenu.classList.contains("is-open") ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16");
+      });
+      document.querySelectorAll(".nav-link").forEach((l) =>
+        l.addEventListener("click", () => {
+          mobileMenu.classList.remove("is-open");
+          mobileBtn.setAttribute("aria-expanded", "false");
+          mobileBtn.querySelector(".mobile-menu-icon").setAttribute("d", "M4 6h16M4 12h16M4 18h16");
+        }),
+      );
 
-        // Smooth scroll pills
-        document.querySelectorAll('a[href^="#"]').forEach(a => {
-            a.addEventListener('click', e => {
-                const t = document.querySelector(a.getAttribute('href'));
-                if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-            });
+      const btt = document.getElementById("back-to-top");
+      window.addEventListener("scroll", () => btt.classList.toggle("show", window.scrollY > 400));
+      btt.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+      document.querySelectorAll('a[href^="#"]').forEach((a) => {
+        a.addEventListener("click", (e) => {
+          const t = document.querySelector(a.getAttribute("href"));
+          if (t) {
+            e.preventDefault();
+            t.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
         });
+      });
 
-        // Reveal
-        const revealObserver = new IntersectionObserver(entries => {
-            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); } });
-        }, { threshold: 0.08 });
-        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("is-visible");
+              revealObserver.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.08 },
+      );
+      document.querySelectorAll(".reveal").forEach((el) => revealObserver.observe(el));
+
+      document.getElementById("current-year").textContent = new Date().getFullYear();
     </script>
-</body>
+  </body>
 </html>

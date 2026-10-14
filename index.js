@@ -1,601 +1,481 @@
+// ── Shared helpers ──
+const root = document.documentElement;
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function readStore(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function writeStore(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Storage blocked (private mode, cookies off): the banner just won't be cached.
+  }
+}
+
+// ── Loading screen ──
+// Shown only on a first visit (no cached banner), and never longer than
+// LOADER_MAX_MS. The page content is always in the DOM underneath it, so a
+// slow or dead presence API can delay the reveal but never block it.
+const LOADER_MAX_MS = 3000;
+const BANNER_TIMEOUT_MS = 6000;
+const BANNER_URL = "https://api.deutscher775.de/presence/690123872674119710/banner";
+
 const messages = [
-    { main: "We're getting things ready for you", sub: "" },
-    { main: "This might take a few seconds", sub: "Don't close this page" }
+  { main: "We're getting things ready for you", sub: "" },
+  { main: "This might take a few seconds", sub: "Don't close this page" },
 ];
-let current = 0;
-const mainText = document.getElementById("mainText");
-const subText = document.getElementById("subText");
+let messageIndex = 0;
+let messageTimer = null;
+
 function showNextMessage() {
-    const { main, sub } = messages[current];
-    mainText.style.opacity = 0;
-    subText.style.opacity = 0;
-    setTimeout(() => {
-        mainText.textContent = main;
-        subText.textContent = sub;
-        mainText.style.animation = "none";
-        subText.style.animation = "none";
-        void mainText.offsetWidth;
-        mainText.style.animation = "loaderfadeinout 2s ease-in-out forwards";
-        subText.style.animation = "loaderfadeinout 2s ease-in-out forwards";
-        if (current === 1) {
-            mainText.style.animation = "loaderfade 2s ease-in-out forwards";
-            subText.style.animation = "loaderfade 2s ease-in-out forwards";
-        }
-        current = current + 1;
-        if (current >= messages.length) return;
-        setTimeout(showNextMessage, 2000);
-    }, 500);
+  const mainText = document.getElementById("mainText");
+  const subText = document.getElementById("subText");
+  if (!mainText || !subText || root.classList.contains("is-ready")) return;
+  const { main, sub } = messages[messageIndex];
+  mainText.style.opacity = 0;
+  subText.style.opacity = 0;
+  messageTimer = setTimeout(() => {
+    mainText.textContent = main;
+    subText.textContent = sub;
+    mainText.style.animation = "none";
+    subText.style.animation = "none";
+    void mainText.offsetWidth;
+    const anim =
+      messageIndex === messages.length - 1
+        ? "loaderfade 2s ease-in-out forwards"
+        : "loaderfadeinout 2s ease-in-out forwards";
+    mainText.style.animation = anim;
+    subText.style.animation = anim;
+    messageIndex++;
+    if (messageIndex < messages.length) messageTimer = setTimeout(showNextMessage, 2000);
+  }, 500);
 }
-setTimeout(showNextMessage, 1000);
 
-
-document.addEventListener('DOMContentLoaded', function() {
-    const header = document.querySelector('nav');
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            header.classList.add('shadow-lg');
-            header.querySelector('.nav-menu').classList.add('py-2');
-            header.querySelector('.nav-menu').classList.remove('py-3');
-        } else {
-            header.classList.remove('shadow-lg');
-            header.querySelector('.nav-menu').classList.remove('py-2');
-            header.querySelector('.nav-menu').classList.add('py-3');
-        }
-    });
-    mobileMenuButton.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
-        const icon = mobileMenuButton.querySelector('.mobile-menu-icon');
-        if (mobileMenu.classList.contains('hidden')) {
-            icon.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
-        } else {
-            icon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
-        }
-    });
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', () => {
-            if (!mobileMenu.classList.contains('hidden')) {
-                mobileMenu.classList.add('hidden');
-                mobileMenuButton.querySelector('.mobile-menu-icon').setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
-            }
-        });
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    function toggleDropdown() {
-        const dropdownOptions = document.getElementById("dropdownOptions");
-        if (dropdownOptions) {
-            dropdownOptions.classList.toggle("hidden");
-        }
-    }
-
-    function selectOption(label, value) {
-        const dropdownSelected = document.getElementById("dropdownSelected");
-        if (dropdownSelected) {
-            dropdownSelected.textContent = label;
-        }
-        toggleDropdown();
-        const selector = document.getElementById('cardSelector');
-        if (selector) {
-            selector.value = value;
-            selector.dispatchEvent(new Event('change'));
-        }
-        const cards = document.querySelectorAll('.card-popup');
-        cards.forEach(card => {
-            card.classList.add('scale-95', 'opacity-0');
-        });
-        if (value) {
-            const card = document.getElementById(value);
-            if (card) {
-                card.classList.remove('hidden');
-                setTimeout(() => {
-                    card.classList.remove('scale-95', 'opacity-0');
-                    card.classList.add('scale-100', 'opacity-100');
-                }, 10);
-            }
-        }
-    }
-
-    const dropdownButton = document.getElementById('dropdownButton');
-    if (dropdownButton) {
-        dropdownButton.addEventListener('click', toggleDropdown);
-    }
-
-    const zerotwoOption = document.querySelector('[data-option="zerotwo"]');
-    if (zerotwoOption) {
-        zerotwoOption.addEventListener('click', function() {
-            selectOption('Zero Two', 'zerotwo');
-        });
-    }
-
-    const astroidOption = document.querySelector('[data-option="astroid"]');
-    if (astroidOption) {
-        astroidOption.addEventListener('click', function() {
-            selectOption('Astroid', 'astroid');
-        });
-    }
-
-    window.addEventListener('click', function (e) {
-        const button = document.getElementById('dropdownButton');
-        const options = document.getElementById('dropdownOptions');
-        if (button && options && !button.contains(e.target)) {
-            options.classList.add('hidden');
-        }
-    });
-});
-
-let embed = {
-    avatar: 'https://api.deutscher775.de/presence/1368272424855932999/avatar',
-    author: 'Zero Two',
-    badge: 'BOT',
-    content: 'This is a <span class="text-pink-400 font-semibold">Discord-like embed</span> with some dummy text. You can use this area to display bot responses, information, or anything else!',
-    timestamp: 'Today at 12:34'
-};
-document.addEventListener('DOMContentLoaded', function () {
-    const zerotwoProfile = document.getElementById('zerotwo-profile');
-    if (zerotwoProfile) {
-        fetch('https://api.deutscher775.de/presence/1368272424855932999/avatar')
-            .then(response => response.json())
-            .then(json => {
-                zerotwoProfile.src = json.avatar;
-            })
-            .catch(error => console.error('Error loading profile image:', error));
-    }
-});
-document.addEventListener('DOMContentLoaded', function() {
-    const selector = document.getElementById('cardSelector');
-    const cards = document.querySelectorAll('.card-popup');
-    if (selector) {
-        selector.addEventListener('change', function () {
-            cards.forEach(card => {
-                card.classList.add('hidden');
-                card.classList.remove('scale-100', 'opacity-100');
-                card.classList.add('scale-95', 'opacity-0');
-            });
-            if (this.value) {
-                if (this.value === 'astroid') {
-                    window.open('https://astroid.cc', '_blank');
-                    setTimeout(() => {
-                        toggleDropdown();
-                        selectOption("Zero Two", "zerotwo");
-                    }, 500);
-                } else if (this.value === 'zerotwo') {
-                    const zerotwoCard = document.getElementById('zerotwo');
-                    if (zerotwoCard) {
-                        zerotwoCard.classList.remove('hidden');
-                        setTimeout(() => {
-                            zerotwoCard.classList.remove('scale-95', 'opacity-0');
-                            zerotwoCard.classList.add('scale-100', 'opacity-100');
-                        }, 10);
-                    }
-                }
-            }
-        });
-    }
-});
-window.addEventListener('load', () => {
-    const zerotwoCard = document.getElementById('zerotwo');
-    const selector = document.getElementById('cardSelector');
-    if (selector) {
-        selector.value = 'zerotwo';
-        selector.dispatchEvent(new Event('change'));
-    }
-    if (zerotwoCard) {
-        zerotwoCard.classList.remove('hidden');
-        setTimeout(() => {
-            zerotwoCard.classList.remove('scale-95', 'opacity-0');
-            zerotwoCard.classList.add('scale-100', 'opacity-100');
-        }, 10);
-    }
-});
-function buildEmbed(embed, content, fields) {
-    embed.content = content || embed.content;
-    embed.timestamp = 'Today at ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const chatWrapper = document.getElementById('chat-wrapper');
-    if (!chatWrapper) return;
-    const embedDiv = document.createElement('div');
-    embedDiv.className = 'flex items-start mb-4';
-    let fieldsHtml = '';
-    if (Array.isArray(fields) && fields.length > 0) {
-        fieldsHtml = `<div class=\"grid grid-cols-1 gap-2 mt-2\">` +
-            fields.map(f =>
-                `<div><span class=\"font-semibold text-pink-300\">${f.name}:</span><span class=\"text-gray-200\">${f.value}</span></div>`
-            ).join('') +
-            `</div>`;
-    }
-    fetch(embed.avatar)
-        .then(response => response.json())
-        .then(json => {
-            const avatarBase64 = json.avatar;
-            embedDiv.innerHTML = `<div class=\"flex-1\"><div class=\"bg-[#23272a] border-l-4 border-pink-400 rounded-lg p-4 shadow-md\"><div class=\"flex items-center mb-2\"><img src=\"${avatarBase64}\" alt=\"Bot Avatar\" class=\"w-8 h-8 rounded-full mr-2\"><span class=\"font-semibold text-white\">${embed.author}</span><span class=\"ml-2 text-xs bg-pink-500 text-white px-2 py-0.5 rounded\">${embed.badge || 'BOT'}</span></div><div class=\"text-gray-200 mb-2\">${embed.content}</div>${fieldsHtml}<div class=\"mt-2 text-xs text-gray-400\">${embed.timestamp}</div></div></div>`;
-            chatWrapper.appendChild(embedDiv);
-        })
-        .catch(error => {
-            console.error('Error loading embed avatar:', error);
-        });
+function revealPage() {
+  if (root.classList.contains("is-ready")) return;
+  root.classList.add("is-ready");
+  clearTimeout(messageTimer);
+  const loadingScreen = document.getElementById("loading-screen");
+  if (!loadingScreen || loadingScreen.style.display === "none") return;
+  const hide = () => (loadingScreen.style.display = "none");
+  if (reduceMotion) return hide();
+  loadingScreen.addEventListener("animationend", hide, { once: true });
+  loadingScreen.style.animation = "fadeOut 0.5s forwards";
+  setTimeout(hide, 600);
 }
-document.addEventListener('DOMContentLoaded', function() {
-    const commandInterface = document.getElementById('command-interface');
-    if (!commandInterface) return;
-    commandInterface.addEventListener('keydown', function (event) {
-        let commands = ["/help","/coding-stats","/add-app",];
-        const menuId = 'command-menu';
-        let menu = document.getElementById(menuId);
-        if (menu) menu.remove();
-        if (event.key === 'Tab') {
-            event.preventDefault();
-            const value = this.value.trim();
-            const match = commands.find(cmd => cmd.startsWith(value));
-            if (match) {
-                this.value = match;
-                if (menu) menu.remove();
-            }
-        } else if (event.key === 'Enter') {
-            event.preventDefault();
-            const value = this.value.trim();
-            const chatWrapper = document.getElementById('chat-wrapper');
-            if (commands.includes(value)) {
-                const userMsg = document.createElement('div');
-                userMsg.className = 'mb-2 text-right';
-                userMsg.innerHTML = `<span class=\"inline-block bg-pink-200 text-pink-900 px-3 py-1 rounded-lg\">${value}</span>`;
-                chatWrapper.appendChild(userMsg);
-                if (value === '/help') {
-                    buildEmbed(embed, 'Here are some commands you can use:', [
-                        { name: '/help', value: 'Show this help message' },
-                        { name: '/coding-stats', value: 'Show your coding stats (with dummy data)' },
-                        { name: '/add-app', value: 'Get the invite link for Zero Two' }
-                    ]);
-                    chatWrapper.scrollTop = chatWrapper.scrollHeight;
-                }
-                if (value === '/coding-stats') {
-                    const wakatimeData = {"data": [{"languages": [{ "name": "HTML", "text": "1 hrs 1 mins", "percent": 93.34 },{ "name": "Python", "text": "0 hrs 4 mins", "percent": 6.66 }],"grand_total": { "text": "1 hrs 6 mins" }},{"languages": [],"grand_total": { "text": "0 hrs 0 mins" }},{"languages": [],"grand_total": { "text": "0 hrs 0 mins" }},{"languages": [],"grand_total": { "text": "0 hrs 0 mins" }},{"languages": [{ "name": "HTML", "text": "0 hrs 28 mins", "percent": 83.12 },{ "name": "Python", "text": "0 hrs 4 mins", "percent": 10.81 },{ "name": "JSON", "text": "0 hrs 1 mins", "percent": 4.39 },{ "name": "JavaScript", "text": "0 hrs 1 mins", "percent": 1.68 }],"grand_total": { "text": "0 hrs 34 mins" }},{"languages": [{ "name": "HTML", "text": "0 hrs 3 mins", "percent": 100 }],"grand_total": { "text": "0 hrs 3 mins" }},{"languages": [{ "name": "HTML", "text": "0 hrs 44 mins", "percent": 93.35 },{ "name": "unknown", "text": "0 hrs 3 mins", "percent": 6.65 }],"grand_total": { "text": "0 hrs 47 mins" }},{"languages": [{ "name": "HTML", "text": "1 hrs 1 mins", "percent": 65.8 },{ "name": "unknown", "text": "0 hrs 32 mins", "percent": 34.2 }],"grand_total": { "text": "1 hrs 33 mins" }},],"cumulative_total": { "text": "4 hrs 3 mins" }};
-                    const total = wakatimeData.cumulative_total.text;
-                    const languageMap = {};
-                    wakatimeData.data.forEach(day => {
-                        (day.languages || []).forEach(lang => {
-                            if (!languageMap[lang.name]) {
-                                languageMap[lang.name] = { name: lang.name, seconds: 0, text: lang.text };
-                            }
-                            languageMap[lang.name].text = lang.text;
-                        });
-                    });
-                    const languages = Object.values(languageMap);
-                    const topLangs = languages.slice(0, 3).map(lang => ({name: lang.name,value: lang.text}));
-                    buildEmbed(embed,`WakaTime Stats (last week | dummy data):<br>Total: <span class=\"text-pink-400\">${total}</span>`,topLangs,);
-                }
-                chatWrapper.scrollTop = chatWrapper.scrollHeight;
-                this.value = '';
-                if (menu) menu.remove();
-            }
-            if (value === '/add-app') {
-                const inviteLink = 'https://discord.com/oauth2/authorize?client_id=1368272424855932999';
-                const botInviteEmbed = document.createElement('div');
-                botInviteEmbed.className = 'flex items-start mb-4';
-                botInviteEmbed.innerHTML = `<div class=\"flex-1\"><div class=\"bg-[#23272a] border-l-4 border-pink-400 rounded-lg p-4 shadow-md\"><div class=\"text-gray-200 mb-2\">Click the button below to add Zero Two as application!</div><div class=\"mt-2 text-xs text-gray-400\">${embed.timestamp}</div></div><a href=\"${inviteLink}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"inline-block bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-colors\" style=\"margin-top:5px;\">Add Zero Two</a></div>`;
-                chatWrapper.appendChild(botInviteEmbed);
-                chatWrapper.scrollTop = chatWrapper.scrollHeight;
-                this.value = '';
-                window.open(inviteLink, '_blank');
-            }
-        } else {
-            const value = this.value.trim();
-            const filtered = commands.filter(cmd => cmd.startsWith(value) && value.length > 0);
-            if (menu) menu.remove();
-            if (filtered.length > 0) {
-                menu = document.createElement('div');
-                menu.id = menuId;
-                menu.style.position = 'absolute';
-                menu.style.background = '#fff';
-                menu.style.border = '1px solid #ccc';
-                menu.style.borderRadius = '0.5rem';
-                menu.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
-                menu.style.zIndex = 1000;
-                menu.style.left = this.offsetLeft + 'px';
-                menu.style.top = (this.offsetTop + this.offsetHeight) + 'px';
-                menu.style.minWidth = this.offsetWidth + 'px';
-                menu.style.maxHeight = '180px';
-                menu.style.overflowY = 'auto';
-                menu.style.fontSize = '1rem';
-                filtered.forEach(cmd => {
-                    const item = document.createElement('div');
-                    item.textContent = cmd;
-                    item.style.padding = '0.5rem 1rem';
-                    item.style.cursor = 'pointer';
-                    item.onmousedown = e => {
-                        e.preventDefault();
-                        this.value = cmd;
-                        this.focus();
-                        menu.remove();
-                    };
-                    item.onmouseover = () => item.style.background = '#f3f4f6';
-                    item.onmouseout = () => item.style.background = '';
-                    menu.appendChild(item);
-                });
-                this.parentNode.appendChild(menu);
-            }
-        }
-    });
-});
 
-document.addEventListener('DOMContentLoaded', function() {
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    const projectCards = document.querySelectorAll('.project-card');
-    filterButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const filter = this.getAttribute('data-filter');
-            filterButtons.forEach(btn => {
-                btn.classList.remove('active', 'bg-gradient-to-r', 'from-pink-500', 'to-purple-600', 'text-white');
-                btn.classList.add('bg-white/80', 'backdrop-blur-sm', 'text-gray-700', 'border', 'border-gray-200');
-            });
-            this.classList.add('active', 'bg-gradient-to-r', 'from-pink-500', 'to-purple-600', 'text-white');
-            this.classList.remove('bg-white/80', 'backdrop-blur-sm', 'text-gray-700', 'border', 'border-gray-200');
-            projectCards.forEach(card => {
-                const categories = card.getAttribute('data-category').split(' ');
-                const shouldShow = filter === 'all' || categories.includes(filter);
-                if (shouldShow) {
-                    card.style.display = 'block';
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0) scale(1)';
-                    }, 10);
-                } else {
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(20px) scale(0.95)';
-                    setTimeout(() => {
-                        card.style.display = 'none';
-                    }, 300);
-                }
-            });
-        });
-    });
-    projectCards.forEach(card => {
-        card.style.transition = 'all 0.3s ease';
-        card.style.opacity = '1';
-        card.style.transform = 'translateY(0) scale(1)';
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({behavior: 'smooth',block: 'start'});
-            }
-            const mobileMenu = document.getElementById('mobile-menu');
-            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
-                mobileMenu.classList.add('hidden');
-                const mobileMenuIcon = document.querySelector('.mobile-menu-icon');
-                if (mobileMenuIcon) {
-                    mobileMenuIcon.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
-                }
-            }
-        });
-    });
-    window.addEventListener('scroll', () => {
-        const nav = document.querySelector('nav');
-        if (!nav) return;
-        const navMenu = nav.querySelector('.nav-menu');
-        if (window.scrollY > 50) {
-            nav.classList.add('nav-scrolled');
-            if (navMenu) {
-                navMenu.classList.add('py-3');
-                navMenu.classList.remove('py-4');
-            }
-        } else {
-            nav.classList.remove('nav-scrolled');
-            if (navMenu) {
-                navMenu.classList.remove('py-3');
-                navMenu.classList.add('py-4');
-            }
-        }
-    });
-    const observerOptions = {threshold: 0.1,rootMargin: '0px 0px -50px 0px'};
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('animate');
-            }
-        });
-    }, observerOptions);
-    const animateElements = document.querySelectorAll('.skill-card-modern, .skill-item, .showcase-card');
-    animateElements.forEach(el => {
-        el.classList.add('animate-on-scroll');
-        observer.observe(el);
-    });
-    setTimeout(() => {
-        const loadingScreen = document.getElementById('loading-screen');
-        const mainContent = document.getElementById('main-content');
-        if (loadingScreen && mainContent) {
-            loadingScreen.style.opacity = '0';
-            loadingScreen.style.transform = 'scale(1.1)';
-            setTimeout(() => {
-                loadingScreen.style.display = 'none';
-                mainContent.style.display = 'block';
-                mainContent.style.opacity = '0';
-                setTimeout(() => {
-                    mainContent.style.transition = 'opacity 0.8s ease-in-out';
-                    mainContent.style.opacity = '1';
-                }, 100);
-            }, 500);
-        }
-    }, 3000);
-    window.addEventListener('scroll', () => {
-        const scrolled = window.pageYOffset;
-        const parallaxElements = document.querySelectorAll('.particle');
-        parallaxElements.forEach((element, index) => {
-            const rate = scrolled * -0.5 * (index + 1);
-            element.style.transform = `translate3d(0, ${rate}px, 0)`;
-        });
-    });
-    const yearElements = document.querySelectorAll('script');
-    yearElements.forEach(script => {
-        if (script.textContent.includes('document.write(new Date().getFullYear())')) {
-            const yearSpan = document.createElement('span');
-            yearSpan.textContent = new Date().getFullYear();
-            script.parentNode.replaceChild(yearSpan, script);
-        }
-    });
-});
-
-let cached_banner = localStorage.getItem('banner_url');
-if (cached_banner) {
-    const loadingScreen = document.getElementById('loading-screen');
-    const mainContent = document.getElementById('main-content');
-    const heroBanner = document.getElementById('hero-banner');
-    if (loadingScreen) loadingScreen.style.display = 'none';
-    if (mainContent) mainContent.style.display = 'block';
-    if (heroBanner) heroBanner.src = cached_banner;
-    if (document.body) document.body.classList.remove('hidden');
-    const transition_secs = 0.2;
-    setTimeout(() => {
-        if (heroBanner) {
-            heroBanner.style.opacity = 1;
-            heroBanner.style.filter = 'brightness(0.3) blur(10px)';
-        }
-    }, transition_secs * 1000);
-    fetch('https://api.deutscher775.de/presence/690123872674119710/banner')
-        .then(response => response.json())
-        .then(data => {
-            const bannerUrl = data.banner ? data.banner : '';
-            if (cached_banner != bannerUrl) {
-                localStorage.setItem('banner_url', bannerUrl);
-                if (heroBanner) heroBanner.src = bannerUrl;
-            }
-        })
-        .catch(error => {
-            console.error('Request failed:', error);
-        });
+const cachedBanner = readStore("banner_url");
+if (cachedBanner || root.classList.contains("skip-loader")) {
+  revealPage();
 } else {
-    fetch('https://api.deutscher775.de/presence/690123872674119710/banner')
-        .then(response => response.json())
-        .then(data => {
-            const bannerUrl = data.banner ? data.banner : '';
-            if (cached_banner != bannerUrl) {
-                localStorage.setItem('banner_url', bannerUrl);
-                const heroBanner = document.getElementById('hero-banner');
-                if (heroBanner) heroBanner.src = bannerUrl;
-            }
-            const loadingScreen = document.getElementById('loading-screen');
-            if (loadingScreen) {
-                loadingScreen.style.animation = "fadeOut 0.5s forwards";
-                const onAnimEnd = () => {
-                    loadingScreen.style.display = 'none';
-                    loadingScreen.removeEventListener('animationend', onAnimEnd);
-                };
-                loadingScreen.addEventListener('animationend', onAnimEnd);
-                setTimeout(() => {
-                    if (loadingScreen.style.display !== 'none') {
-                        loadingScreen.style.display = 'none';
-                    }
-                }, 600);
-            }
-            const mainContent = document.getElementById('main-content');
-            if (mainContent) {
-                mainContent.style.display = 'block';
-            }
-            const transition_secs = 0.2;
-            setTimeout(() => {
-                const heroBanner = document.getElementById('hero-banner');
-                if (heroBanner) {
-                    heroBanner.style.opacity = 1;
-                    heroBanner.style.filter = 'brightness(0.3) blur(10px)';
-                }
-            }, transition_secs * 1000);
-        })
-        .catch(error => {
-            console.error('Request failed:', error);
-            const loadingScreen = document.getElementById('loading-screen');
-            if (loadingScreen) {
-                loadingScreen.style.animation = "fadeOut 0.5s forwards";
-                const onAnimEnd = () => {
-                    loadingScreen.style.display = 'none';
-                    loadingScreen.removeEventListener('animationend', onAnimEnd);
-                };
-                loadingScreen.addEventListener('animationend', onAnimEnd);
-                setTimeout(() => {
-                    if (loadingScreen.style.display !== 'none') {
-                        loadingScreen.style.display = 'none';
-                    }
-                }, 600);
-            }
-            const mainContent = document.getElementById('main-content');
-            if (mainContent) {
-                mainContent.style.display = 'block';
-            }
-        });
+  messageTimer = setTimeout(showNextMessage, 1000);
+  setTimeout(revealPage, LOADER_MAX_MS);
 }
-document.addEventListener('DOMContentLoaded', function() {
-    const header = document.querySelector('nav');
-    if (header) {
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                header.classList.add('shadow-lg');
-                const navMenu = header.querySelector('.nav-menu');
-                if (navMenu) {
-                    navMenu.classList.add('py-2');
-                    navMenu.classList.remove('py-3');
-                }
-            } else {
-                header.classList.remove('shadow-lg');
-                const navMenu = header.querySelector('.nav-menu');
-                if (navMenu) {
-                    navMenu.classList.remove('py-2');
-                    navMenu.classList.add('py-3');
-                }
-            }
-        });
+
+// ── Live hero banner (Discord presence) ──
+function showBanner(url) {
+  const heroBanner = document.getElementById("hero-banner");
+  if (!heroBanner || !url) return;
+  heroBanner.addEventListener("load", () => (heroBanner.style.opacity = 1), { once: true });
+  heroBanner.addEventListener("error", () => (heroBanner.style.opacity = 0), { once: true });
+  heroBanner.src = url;
+}
+
+showBanner(cachedBanner);
+
+(async function refreshBanner() {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), BANNER_TIMEOUT_MS);
+  try {
+    const response = await fetch(BANNER_URL, { signal: controller.signal });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    const bannerUrl = typeof data.banner === "string" ? data.banner : "";
+    if (bannerUrl && bannerUrl !== cachedBanner) {
+      writeStore("banner_url", bannerUrl);
+      showBanner(bannerUrl);
     }
+  } catch (error) {
+    console.warn("Presence banner unavailable:", error.message);
+  } finally {
+    clearTimeout(timeout);
+    revealPage();
+  }
+})();
 
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
+// ── Nav: scroll state, mobile menu ──
+document.addEventListener("DOMContentLoaded", function () {
+  const navStrip = document.querySelector(".nav-strip");
+  if (navStrip) {
+    const onScroll = () => navStrip.classList.toggle("is-scrolled", window.scrollY > 50);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
 
-    if (mobileMenuButton && mobileMenu) {
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-            const icon = mobileMenuButton.querySelector('.mobile-menu-icon');
-            if (icon) {
-                if (mobileMenu.classList.contains('hidden')) {
-                    icon.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
-                } else {
-                    icon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
-                }
-            }
-        });
+  const mobileMenuButton = document.getElementById("mobile-menu-button");
+  const mobileMenu = document.getElementById("mobile-menu");
+  const setMenu = (open) => {
+    if (!mobileMenu || !mobileMenuButton) return;
+    mobileMenu.classList.toggle("is-open", open);
+    mobileMenuButton.setAttribute("aria-expanded", String(open));
+    const icon = mobileMenuButton.querySelector(".mobile-menu-icon");
+    if (icon) icon.setAttribute("d", open ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16");
+  };
+
+  mobileMenuButton?.addEventListener("click", () =>
+    setMenu(!mobileMenu.classList.contains("is-open")),
+  );
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && mobileMenu?.classList.contains("is-open")) {
+      setMenu(false);
+      mobileMenuButton.focus();
     }
+  });
 
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', () => {
-            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
-                mobileMenu.classList.add('hidden');
-                const icon = mobileMenuButton.querySelector('.mobile-menu-icon');
-                if (icon) {
-                    icon.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
-                }
-            }
-        });
+  // In-page anchors: smooth scroll (instant under reduced motion), close the menu.
+  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.addEventListener("click", function (e) {
+      const id = this.getAttribute("href");
+      const target = id.length > 1 ? document.querySelector(id) : null;
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+        history.replaceState(null, "", id);
+      }
+      setMenu(false);
     });
+  });
+  document.querySelectorAll(".nav-link").forEach((link) =>
+    link.addEventListener("click", () => setMenu(false)),
+  );
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    const yearElement = document.getElementById('current-year');
-    if (yearElement) {
-        yearElement.textContent = new Date().getFullYear();
-    }
+// ── Age readout (About section) ──
+document.addEventListener("DOMContentLoaded", function () {
+  const age = document.getElementById("age");
+  if (!age) return;
+  const birth = new Date(2006, 10, 29); // November 29, 2006
+  const now = new Date();
+  let years = now.getFullYear() - birth.getFullYear();
+  const m = now.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) years--;
+  age.textContent = `${years}-year-old`;
 });
 
-document.addEventListener("DOMContentLoaded", async function() {
-    try {
-    await fetch("https://google.com").then(resp => {
-        console.log(resp.ok)
-    })
-    } catch (e) {
-        console.error("Not connected to Internet. Skipping loading screen.")
-        document.getElementById("loading-screen").style.display = "none"
+// ── Project filter ──
+document.addEventListener("DOMContentLoaded", function () {
+  const filterButtons = document.querySelectorAll(".filter-btn");
+  const projectCards = document.querySelectorAll(".scene-panel");
+  const hideTimers = new Map();
+
+  projectCards.forEach((card) => {
+    card.style.transition = "opacity 0.3s ease, transform 0.3s ease, border-color 0.25s ease";
+  });
+
+  filterButtons.forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.classList.contains("is-active")));
+    button.addEventListener("click", function () {
+      const filter = this.getAttribute("data-filter");
+      filterButtons.forEach((btn) => {
+        btn.classList.toggle("is-active", btn === this);
+        btn.setAttribute("aria-pressed", String(btn === this));
+      });
+
+      projectCards.forEach((card) => {
+        const categories = (card.getAttribute("data-category") || "").split(" ");
+        const shouldShow = filter === "all" || categories.includes(filter);
+        clearTimeout(hideTimers.get(card));
+        if (shouldShow) {
+          card.hidden = false;
+          requestAnimationFrame(() => {
+            card.style.opacity = "1";
+            card.style.transform = "none";
+          });
+        } else {
+          card.style.opacity = "0";
+          card.style.transform = "translateY(12px)";
+          hideTimers.set(
+            card,
+            setTimeout(() => (card.hidden = true), reduceMotion ? 0 : 300),
+          );
+        }
+      });
+    });
+  });
+});
+
+// ── Scroll reveal + footer year ──
+document.addEventListener("DOMContentLoaded", function () {
+  const reveals = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window) {
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" },
+    );
+    reveals.forEach((el) => revealObserver.observe(el));
+  } else {
+    reveals.forEach((el) => el.classList.add("is-visible"));
+  }
+
+  const yearEl = document.getElementById("current-year");
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  const backToTop = document.getElementById("back-to-top");
+  if (backToTop) {
+    window.addEventListener(
+      "scroll",
+      () => backToTop.classList.toggle("show", window.scrollY > 600),
+      { passive: true },
+    );
+    backToTop.addEventListener("click", () =>
+      window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" }),
+    );
+  }
+});
+
+// ── Floating throwable tech icons (skills section easter egg) ──
+const thrownIcons = new Set();
+
+function startMouseShake() {
+  if (reduceMotion) return;
+  const originalCursor = document.body.style.cursor;
+  const style = document.createElement("style");
+  style.textContent = `
+    @keyframes mouseShake {
+      0%, 100% { transform: translate(0, 0); }
+      10% { transform: translate(-2px, -1px); }
+      20% { transform: translate(2px, -2px); }
+      30% { transform: translate(-1px, 2px); }
+      40% { transform: translate(1px, -1px); }
+      50% { transform: translate(-2px, 1px); }
+      60% { transform: translate(2px, 1px); }
+      70% { transform: translate(-1px, -2px); }
+      80% { transform: translate(1px, 2px); }
+      90% { transform: translate(-2px, -1px); }
     }
-})
+    .mouse-shake {
+      animation: mouseShake 0.1s infinite;
+      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><text y="24" font-size="24">⚡</text></svg>') 16 16, auto !important;
+    }
+  `;
+  document.head.appendChild(style);
+  document.body.classList.add("mouse-shake");
+  setTimeout(() => {
+    document.body.classList.remove("mouse-shake");
+    document.head.removeChild(style);
+    document.body.style.cursor = originalCursor;
+  }, 1000);
+}
 
+// "Broken screen" gag from the 💻 floater. Flash-safe by construction: no
+// saturated red, no repeating brightness pulse, one short jolt on arrival,
+// never stacks, Escape clears it early, skipped entirely under reduced motion.
+let activeCracks = null;
 
+function createScreenCracks() {
+  if (reduceMotion || activeCracks) return;
+
+  const container = document.createElement("div");
+  container.className = "screen-cracks-container";
+  container.setAttribute("aria-hidden", "true");
+  container.style.cssText =
+    "position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden;";
+
+  const colors = ["#00e5ff", "#39ff88", "#3355ff", "#f5f2f3", "#000000"];
+  const stripes = [];
+  for (let i = 0; i < 8; i++) {
+    const stripe = document.createElement("div");
+    const horizontal = Math.random() > 0.3;
+    const thickness = Math.random() * 20 + 15;
+    const position = Math.random() * 100;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    stripe.style.cssText = horizontal
+      ? `position:absolute;top:${position}%;left:0;width:100%;height:${thickness}px;background:${color};`
+      : `position:absolute;top:0;left:${position}%;width:${thickness}px;height:100%;background:${color};`;
+    stripe.dataset.axis = horizontal ? "y" : "x";
+    container.appendChild(stripe);
+    stripes.push(stripe);
+  }
+
+  document.body.appendChild(container);
+  container.animate(
+    [
+      { transform: "translate(0, 0)" },
+      { transform: "translate(-3px, 1px)" },
+      { transform: "translate(2px, -1px)" },
+      { transform: "translate(0, 0)" },
+    ],
+    { duration: 180, easing: "steps(3, end)" },
+  );
+
+  const clear = () => {
+    if (activeCracks !== container) return;
+    activeCracks = null;
+    clearTimeout(timer);
+    document.removeEventListener("keydown", onKey);
+    stripes.forEach((stripe, i) => {
+      stripe.animate(
+        [
+          { opacity: 1, transform: "none" },
+          { opacity: 0, transform: stripe.dataset.axis === "y" ? "scaleY(0)" : "scaleX(0)" },
+        ],
+        { duration: 300, delay: i * 60, easing: "ease-in", fill: "forwards" },
+      );
+    });
+    setTimeout(() => container.remove(), 300 + stripes.length * 60);
+  };
+  const onKey = (e) => e.key === "Escape" && clear();
+  const timer = setTimeout(clear, 6000);
+  document.addEventListener("keydown", onKey);
+  activeCracks = container;
+}
+
+// ── Floaters: drift with transforms only (no layout work per frame) ──
+const floaterPos = new WeakMap();
+
+function floaterBounds(el) {
+  const box = el.parentElement;
+  return { w: box.clientWidth, h: box.clientHeight };
+}
+
+function moveFloater(el, x, y, rotation, scale, transition) {
+  floaterPos.set(el, { x, y, rotation });
+  el.style.transition = transition;
+  el.style.transform = `translate(${x}px, ${y}px) rotate(${rotation}deg) scale(${scale})`;
+}
+
+function randomSpot(el) {
+  const { w, h } = floaterBounds(el);
+  return {
+    x: Math.random() * Math.max(w - 80, 0),
+    y: Math.random() * Math.max(h - 200, 0) + 100,
+  };
+}
+
+function initializeIcons() {
+  document.querySelectorAll(".floater").forEach((el, index) => {
+    el.style.left = "0";
+    el.style.top = "0";
+    el.style.willChange = "transform";
+
+    if (reduceMotion) {
+      const { x, y } = randomSpot(el);
+      el.style.opacity = "0.55";
+      moveFloater(el, x, y, Math.random() * 40 - 20, 1, "none");
+      return;
+    }
+
+    const { w, h } = floaterBounds(el);
+    const side = Math.floor(Math.random() * 4);
+    const startX = side === 1 ? w + 150 : side === 3 ? -150 : Math.random() * w;
+    const startY = side === 0 ? -150 : side === 2 ? h + 150 : Math.random() * h;
+    el.style.opacity = "0";
+    moveFloater(el, startX, startY, Math.random() * 360, 0.5, "none");
+    setTimeout(() => flyInIcon(el), index * 300 + Math.random() * 500);
+  });
+}
+
+function flyInIcon(el) {
+  const { x, y } = randomSpot(el);
+  el.style.opacity = "0.55";
+  moveFloater(
+    el,
+    x,
+    y,
+    Math.random() * 360,
+    1,
+    "transform 2s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 2s ease",
+  );
+  setTimeout(() => randomFloat(el), 2000);
+}
+
+function randomFloat(el) {
+  if (reduceMotion || thrownIcons.has(el)) return;
+  const { x, y } = randomSpot(el);
+  moveFloater(el, x, y, Math.random() * 360, 1, "transform 10s ease-in-out");
+}
+
+function throwIcon(el, event) {
+  event.stopPropagation();
+  if (el.textContent.trim() !== "⚡") {
+    setTimeout(() => {
+      const audio1 = new Audio("./vine-boom.mp3");
+      const audio2 = new Audio("./AHhHhhh.mp3");
+      audio1.volume = 0.1;
+      audio2.volume = 0.05;
+      if (Math.random() < 0.5) audio1.play().catch(console.error);
+      else audio2.play().catch(console.error);
+    }, 100);
+  } else {
+    setTimeout(() => {
+      const audio = new Audio("./bzzzzzz.mp3");
+      audio.volume = 0.01;
+      audio.play().catch(console.error);
+    }, 100);
+  }
+
+  if (reduceMotion || thrownIcons.has(el)) return;
+  thrownIcons.add(el);
+
+  const pos = floaterPos.get(el) || { x: 0, y: 0, rotation: 0 };
+  const rect = el.getBoundingClientRect();
+  const deltaX = rect.left + rect.width / 2 - event.clientX;
+  const deltaY = rect.top + rect.height / 2 - event.clientY;
+  const distance = Math.hypot(deltaX, deltaY) || 1;
+  const throwForce = Math.max(200, 600 - distance);
+  const x = pos.x + (deltaX / distance) * throwForce;
+  const y = pos.y + (deltaY / distance) * throwForce;
+  const spin = pos.rotation + (3 + throwForce / 100) * 360;
+
+  el.style.opacity = "1";
+  moveFloater(el, x, y, spin, 1.3, "transform 1.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease");
+
+  setTimeout(() => {
+    moveFloater(el, x, y, spin, 0.9, "transform 0.3s ease-out");
+    setTimeout(() => {
+      // Normalize the accumulated spin without animating back through it.
+      moveFloater(el, x, y, spin % 360, 0.9, "none");
+      void el.offsetWidth;
+      el.style.opacity = "0.55";
+      moveFloater(el, x, y, spin % 360, 1, "transform 0.3s ease-out, opacity 0.3s ease");
+      setTimeout(() => {
+        thrownIcons.delete(el);
+        randomFloat(el);
+      }, 800);
+    }, 300);
+  }, 1800);
+}
+
+function animateFloaters() {
+  document.querySelectorAll(".floater").forEach((el, index) => {
+    if (!thrownIcons.has(el)) setTimeout(() => randomFloat(el), index * 1667);
+  });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeIcons);
+} else if (document.querySelector(".floater")) {
+  initializeIcons();
+}
+
+if (!reduceMotion) {
+  setTimeout(() => setInterval(animateFloaters, 12000), 5000);
+  window.addEventListener("resize", () => {
+    if (!document.querySelector(".floater")) return;
+    thrownIcons.clear();
+    animateFloaters();
+  });
+}

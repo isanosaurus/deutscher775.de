@@ -1,420 +1,184 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact - Isabella</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; }
-
-        :root {
-            --bg:     #090909;
-            --s1:     #111111;
-            --s2:     #181818;
-            --bd:     rgba(255,255,255,0.07);
-            --bd-a:   rgba(255,0,115,0.35);
-            --t1:     #ffffff;
-            --t2:     #888888;
-            --t3:     #555555;
-            --accent: #ff0073;
-            --adim:   rgba(255,0,115,0.12);
-            --aglow:  rgba(255,0,115,0.22);
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: var(--bg);
-            color: var(--t1);
-            min-height: 100vh;
-        }
-
-        /* ── Noise grain overlay ── */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* ── Navigation ── */
-        nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; }
-        .nav-inner {
-            padding: 1.25rem 1.5rem;
-            background: rgba(9,9,9,0.88);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--bd);
-            transition: padding 0.3s;
-        }
-        .nav-inner.scrolled { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-
-        .logo {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: var(--t1);
-            text-decoration: none;
-            letter-spacing: -0.02em;
-            transition: color 0.25s;
-        }
-        .logo span { color: var(--accent); }
-        .logo:hover { color: var(--accent); }
-
-        .nav-link {
-            position: relative;
-            font-weight: 500;
-            font-size: 0.9rem;
-            color: var(--t2);
-            text-decoration: none;
-            transition: color 0.25s;
-            padding-bottom: 2px;
-        }
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -2px; left: 0;
-            width: 0; height: 2px;
-            background: var(--accent);
-            transition: width 0.3s ease;
-            border-radius: 2px;
-        }
-        .nav-link:hover { color: var(--t1); }
-        .nav-link:hover::after { width: 100%; }
-
-        /* ── Accent blob ── */
-        .blob {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(80px);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* ── Page content ── */
-        .page-content { position: relative; z-index: 1; }
-
-        /* ── Section tag ── */
-        .section-tag {
-            display: inline-block;
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 0.75rem;
-        }
-
-        /* ── Cards ── */
-        .card {
-            background: var(--s1);
-            border: 1px solid var(--bd);
-            border-radius: 16px;
-            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
-        }
-        .card:hover {
-            border-color: var(--bd-a);
-            box-shadow: 0 8px 40px var(--aglow);
-            transform: translateY(-2px);
-        }
-
-        /* ── Form elements ── */
-        .field-label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--t2);
-            margin-bottom: 0.5rem;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-        .field {
-            width: 100%;
-            padding: 0.85rem 1rem;
-            background: var(--s2);
-            border: 1px solid var(--bd);
-            border-radius: 10px;
-            color: var(--t1);
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.9rem;
-            outline: none;
-            transition: border-color 0.25s, box-shadow 0.25s;
-        }
-        .field::placeholder { color: var(--t3); }
-        .field:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--adim);
-        }
-
-        /* ── Buttons ── */
-        .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.85rem 2rem;
-            background: var(--accent);
-            color: #fff;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
-            text-decoration: none;
-        }
-        .btn-primary:hover {
-            background: #cc005c;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 28px var(--aglow);
-            color: #fff;
-        }
-
-        /* ── Icon badge ── */
-        .icon-badge {
-            width: 44px; height: 44px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            flex-shrink: 0;
-        }
-
-        /* ── Social icon ── */
-        .social-btn {
-            width: 44px; height: 44px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--s2);
-            border: 1px solid var(--bd);
-            color: var(--t2);
-            font-size: 1.1rem;
-            text-decoration: none;
-            transition: border-color 0.25s, color 0.25s, transform 0.2s;
-        }
-        .social-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            transform: translateY(-2px);
-        }
-
-        /* ── Reveal ── */
-        .reveal {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
-        }
-        .reveal.visible { opacity: 1; transform: translateY(0); }
-
-        /* ── Divider ── */
-        .divider { border: none; border-top: 1px solid var(--bd); }
-
-        /* ── Footer ── */
-        footer { background: var(--s1); border-top: 1px solid var(--bd); }
-        footer a { color: var(--t2); text-decoration: none; font-size: 0.875rem; transition: color 0.25s; }
-        footer a:hover { color: var(--accent); }
-
-        /* mobile */
-        @media (max-width: 768px) { body { overflow-x: hidden; } }
-    </style>
-</head>
-<body>
-    <!-- Accent blobs -->
-    <div class="blob" style="width:500px;height:500px;top:-100px;left:-150px;background:rgba(255,0,115,0.07);"></div>
-    <div class="blob" style="width:400px;height:400px;bottom:-100px;right:-100px;background:rgba(255,0,115,0.05);"></div>
-
-    <!-- Navigation -->
-    <nav>
-        <div class="nav-inner" id="nav-inner">
-            <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <a href="/" class="logo">Isabella<span>.</span></a>
-
-                <div class="hidden md:flex items-center gap-8">
-                    <a href="/" class="nav-link">Home</a>
-                    <a href="/#about" class="nav-link">About</a>
-                    <a href="/#projects" class="nav-link">Projects</a>
-                    <a href="./contact" class="nav-link" style="color:#fff;">Contact</a>
-                    <a href="./imprint" class="nav-link">Imprint</a>
-                </div>
-
-                <button id="mobile-menu-button" style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:0.5rem;cursor:pointer;" class="md:hidden">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path class="mobile-menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                </button>
-            </div>
-
-            <div id="mobile-menu" class="hidden md:hidden mt-4">
-                <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:1rem;" class="flex flex-col gap-3">
-                    <a href="/" class="nav-link text-center py-1">Home</a>
-                    <a href="/#about" class="nav-link text-center py-1">About</a>
-                    <a href="/#projects" class="nav-link text-center py-1">Projects</a>
-                    <a href="./contact" class="nav-link text-center py-1" style="color:#fff;">Contact</a>
-                    <a href="./imprint" class="nav-link text-center py-1">Imprint</a>
-                </div>
-            </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact — Isabella</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./out.css" />
+    <script>document.documentElement.classList.add("js");</script>
+  </head>
+  <!-- Icons: Font Awesome Free 6.4 by @fontawesome, https://fontawesome.com (CC BY 4.0) -->
+  <body>
+    <!-- Nav -->
+    <nav class="nav-strip" id="nav-strip">
+      <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <a href="/" class="logo">Isabella<em>.</em></a>
+        <div class="hidden md:flex items-center gap-8">
+          <a href="/" class="nav-link">Home</a>
+          <a href="/#about" class="nav-link">About</a>
+          <a href="/#projects" class="nav-link">Projects</a>
+          <a href="./contact" class="nav-link is-current">Contact</a>
+          <a href="./imprint" class="nav-link">Imprint</a>
         </div>
+        <button
+          id="mobile-menu-button"
+          class="md:hidden flex items-center justify-center icon-btn"
+          aria-label="Menu"
+          aria-controls="mobile-menu"
+          aria-expanded="false"
+        >
+          <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path class="mobile-menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+      <div id="mobile-menu" class="mt-4 md:hidden">
+        <div class="flex flex-col gap-3 p-4" style="background: var(--panel-2); border: 1px solid var(--seam)">
+          <a href="/" class="nav-link text-center">Home</a>
+          <a href="/#about" class="nav-link text-center">About</a>
+          <a href="/#projects" class="nav-link text-center">Projects</a>
+          <a href="./contact" class="nav-link text-center is-current">Contact</a>
+          <a href="./imprint" class="nav-link text-center">Imprint</a>
+        </div>
+      </div>
     </nav>
 
-    <script>
-        const navInner = document.getElementById('nav-inner');
-        window.addEventListener('scroll', () => {
-            navInner.classList.toggle('scrolled', window.scrollY > 40);
-        });
-        const mobileBtn = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-        mobileBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-            const icon = mobileBtn.querySelector('.mobile-menu-icon');
-            icon.setAttribute('d', mobileMenu.classList.contains('hidden') ? 'M4 6h16M4 12h16M4 18h16' : 'M6 18L18 6M6 6l12 12');
-        });
-        document.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', () => {
-            mobileMenu.classList.add('hidden');
-            mobileBtn.querySelector('.mobile-menu-icon').setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
-        }));
-    </script>
-
     <!-- Main -->
-    <main class="page-content pt-32 pb-24">
-        <div class="max-w-6xl mx-auto px-4">
-
-            <!-- Heading -->
-            <div class="text-center mb-16 reveal">
-                <span class="section-tag">Get in touch</span>
-                <h1 style="font-size:clamp(2.5rem,6vw,4.5rem);font-weight:800;letter-spacing:-0.03em;line-height:1.1;" class="mb-4">
-                    Contact<span style="color:var(--accent);">.</span>
-                </h1>
-                <p style="color:var(--t2);font-size:1.1rem;max-width:480px;" class="mx-auto">
-                    Have a project in mind or just want to say hi? I'd love to hear from you.
-                </p>
-            </div>
-
-            <!-- Grid -->
-            <div class="grid lg:grid-cols-5 gap-8 items-start">
-
-                <!-- Contact Form -->
-                <div class="lg:col-span-3 card p-8 reveal" style="transition-delay:0.1s">
-                    <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:1.75rem;">Send a message</h2>
-                    <form action="https://formspree.io/f/xblgvqoe" method="POST" class="flex flex-col gap-5">
-                        <div>
-                            <label class="field-label" for="name">Name</label>
-                            <input type="text" id="name" name="name" required placeholder="Your name" class="field">
-                        </div>
-                        <div>
-                            <label class="field-label" for="email">Email</label>
-                            <input type="email" id="email" name="email" required placeholder="your.email@example.com" class="field">
-                        </div>
-                        <div>
-                            <label class="field-label" for="message">Message</label>
-                            <textarea id="message" name="message" rows="5" required placeholder="Tell me about your project or just say hello!" class="field" style="resize:none;"></textarea>
-                        </div>
-                        <button type="submit" class="btn-primary w-full mt-2">
-                            Send Message
-                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-                            </svg>
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Info cards -->
-                <div class="lg:col-span-2 flex flex-col gap-5">
-
-                    <!-- Email -->
-                    <div class="card p-6 reveal" style="transition-delay:0.15s">
-                        <div class="flex items-start gap-4">
-                            <div class="icon-badge" style="background:var(--adim);">
-                                <i class="fas fa-envelope" style="color:var(--accent);"></i>
-                            </div>
-                            <div>
-                                <p style="font-weight:700;margin-bottom:0.25rem;">Email</p>
-                                <a href="mailto:jason@jesn.zip" style="color:var(--accent);font-size:0.9rem;">jason@jesn.zip</a>
-                                <p style="color:var(--t2);font-size:0.8rem;margin-top:0.4rem;">I'll reply as soon as possible.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Phone -->
-                    <div class="card p-6 reveal" style="transition-delay:0.2s">
-                        <div class="flex items-start gap-4">
-                            <div class="icon-badge" style="background:rgba(34,197,94,0.1);">
-                                <i class="fas fa-phone" style="color:#22c55e;"></i>
-                            </div>
-                            <div>
-                                <p style="font-weight:700;margin-bottom:0.25rem;">Phone</p>
-                                <a href="tel:+4915901147061" style="color:#22c55e;font-size:0.9rem;">+49 159 01147061</a>
-                                <p style="color:var(--t2);font-size:0.8rem;margin-top:0.4rem;">For urgent inquiries only.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Response time -->
-                    <div class="card p-6 reveal" style="transition-delay:0.25s">
-                        <div class="flex items-start gap-4">
-                            <div class="icon-badge" style="background:rgba(251,191,36,0.1);">
-                                <i class="fas fa-clock" style="color:#fbbf24;"></i>
-                            </div>
-                            <div>
-                                <p style="font-weight:700;margin-bottom:0.25rem;">Response Time</p>
-                                <p style="color:#fbbf24;font-size:0.9rem;">Usually within 24 hours</p>
-                                <p style="color:var(--t2);font-size:0.8rem;margin-top:0.4rem;">For urgent matters, mention it or call.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Social -->
-                    <div class="card p-6 reveal" style="transition-delay:0.3s">
-                        <p style="font-weight:700;margin-bottom:1rem;">Find me on</p>
-                        <div class="flex gap-3">
-                            <a href="https://github.com/isanosaurus" target="_blank" rel="noopener noreferrer" class="social-btn" title="GitHub">
-                                <i class="fab fa-github"></i>
-                            </a>
-                            <a href="https://tiktok.com/@deutscher775" target="_blank" rel="noopener noreferrer" class="social-btn" title="TikTok">
-                                <i class="fab fa-tiktok"></i>
-                            </a>
-                            <a href="https://discordapp.com/users/690123872674119710" target="_blank" rel="noopener noreferrer" class="social-btn" title="Discord">
-                                <i class="fab fa-discord"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
+    <main class="pt-36 pb-24 px-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="section-head reveal mb-16">
+          <h1 class="mb-4">Contact<span style="color: var(--accent)">.</span></h1>
+          <p>Have a project in mind or just want to say hi? I'd love to hear from you.</p>
         </div>
+
+        <div class="grid lg:grid-cols-5 gap-8 items-start">
+          <!-- Form panel -->
+          <div class="lg:col-span-3 panel panel--static p-8 reveal" style="transition-delay: 0.05s">
+            <h2 class="text-xl font-bold mb-7" style="color: var(--text-1)">Send a message</h2>
+            <form action="https://formspree.io/f/xblgvqoe" method="POST" class="flex flex-col gap-5">
+              <div>
+                <label class="field-label" for="name">Name</label>
+                <input type="text" id="name" name="name" required placeholder="Your name" class="field" />
+              </div>
+              <div>
+                <label class="field-label" for="email">Email</label>
+                <input type="email" id="email" name="email" required placeholder="your.email@example.com" class="field" />
+              </div>
+              <div>
+                <label class="field-label" for="message">Message</label>
+                <textarea id="message" name="message" rows="5" required placeholder="Tell me about your project or just say hello!" class="field" style="resize: none"></textarea>
+              </div>
+              <button type="submit" class="panel-btn panel-btn--accent w-full mt-2">
+                Send Message
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </button>
+            </form>
+          </div>
+
+          <!-- Info panel -->
+          <div class="lg:col-span-2 panel panel--static p-8 reveal" style="transition-delay: 0.1s">
+            <h2 class="text-xl font-bold mb-7" style="color: var(--text-1)">Other ways to reach me</h2>
+            <ul class="info-list">
+              <li>
+                <div class="icon-well"><svg class="icon" viewBox="0 0 512 512" style="width:1em" aria-hidden="true" focusable="false"><path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"/></svg></div>
+                <div>
+                  <p class="label">Email</p>
+                  <a href="mailto:jason@jesn.zip" class="value">jason@jesn.zip</a>
+                  <p class="note">I'll reply as soon as possible.</p>
+                </div>
+              </li>
+              <li>
+                <div class="icon-well"><svg class="icon" viewBox="0 0 512 512" style="width:1em" aria-hidden="true" focusable="false"><path d="M164.9 24.6c-7.7-18.6-28-28.5-47.4-23.2l-88 24C12.1 30.2 0 46 0 64C0 311.4 200.6 512 448 512c18 0 33.8-12.1 38.6-29.5l24-88c5.3-19.4-4.6-39.7-23.2-47.4l-96-40c-16.3-6.8-35.2-2.1-46.3 11.6L304.7 368C234.3 334.7 177.3 277.7 144 207.3L193.3 167c13.7-11.2 18.4-30 11.6-46.3l-40-96z"/></svg></div>
+                <div>
+                  <p class="label">Phone</p>
+                  <a href="tel:+4915901147061" class="value">+49 159 01147061</a>
+                  <p class="note">For urgent inquiries only.</p>
+                </div>
+              </li>
+              <li>
+                <div class="icon-well"><svg class="icon" viewBox="0 0 512 512" style="width:1em" aria-hidden="true" focusable="false"><path d="M256 0a256 256 0 1 1 0 512A256 256 0 1 1 256 0zM232 120V256c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2V120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"/></svg></div>
+                <div>
+                  <p class="label">Response time</p>
+                  <p class="value" style="color: var(--text-1)">Usually within 24 hours</p>
+                  <p class="note">For urgent matters, mention it or call.</p>
+                </div>
+              </li>
+              <li>
+                <div class="icon-well"><svg class="icon" viewBox="0 0 448 512" style="width:0.875em" aria-hidden="true" focusable="false"><path d="M352 224c53 0 96-43 96-96s-43-96-96-96s-96 43-96 96c0 4 .2 8 .7 11.9l-94.1 47C145.4 170.2 121.9 160 96 160c-53 0-96 43-96 96s43 96 96 96c25.9 0 49.4-10.2 66.6-26.9l94.1 47c-.5 3.9-.7 7.8-.7 11.9c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-25.9 0-49.4 10.2-66.6 26.9l-94.1-47c.5-3.9 .7-7.8 .7-11.9s-.2-8-.7-11.9l94.1-47C302.6 213.8 326.1 224 352 224z"/></svg></div>
+                <div>
+                  <p class="label">Find me on</p>
+                  <div class="flex gap-3 mt-3">
+                    <a href="https://github.com/isanosaurus" target="_blank" rel="noopener noreferrer" class="social-panel" title="GitHub" aria-label="GitHub"><svg class="icon" viewBox="0 0 496 512" style="width:0.969em" aria-hidden="true" focusable="false"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></a>
+                    <a href="https://tiktok.com/@deutscher775" target="_blank" rel="noopener noreferrer" class="social-panel" title="TikTok" aria-label="TikTok"><svg class="icon" viewBox="0 0 448 512" style="width:0.875em" aria-hidden="true" focusable="false"><path d="M448,209.91a210.06,210.06,0,0,1-122.77-39.25V349.38A162.55,162.55,0,1,1,185,188.31V278.2a74.62,74.62,0,1,0,52.23,71.18V0l88,0a121.18,121.18,0,0,0,1.86,22.17h0A122.18,122.18,0,0,0,381,102.39a121.43,121.43,0,0,0,67,20.14Z"/></svg></a>
+                    <a href="https://discord.com/users/690123872674119710" target="_blank" rel="noopener noreferrer" class="social-panel" title="Discord" aria-label="Discord"><svg class="icon" viewBox="0 0 640 512" style="width:1.25em" aria-hidden="true" focusable="false"><path d="M524.531,69.836a1.5,1.5,0,0,0-.764-.7A485.065,485.065,0,0,0,404.081,32.03a1.816,1.816,0,0,0-1.923.91,337.461,337.461,0,0,0-14.9,30.6,447.848,447.848,0,0,0-134.426,0,309.541,309.541,0,0,0-15.135-30.6,1.89,1.89,0,0,0-1.924-.91A483.689,483.689,0,0,0,116.085,69.137a1.712,1.712,0,0,0-.788.676C39.068,183.651,18.186,294.69,28.43,404.354a2.016,2.016,0,0,0,.765,1.375A487.666,487.666,0,0,0,176.02,479.918a1.9,1.9,0,0,0,2.063-.676A348.2,348.2,0,0,0,208.12,430.4a1.86,1.86,0,0,0-1.019-2.588,321.173,321.173,0,0,1-45.868-21.853,1.885,1.885,0,0,1-.185-3.126c3.082-2.309,6.166-4.711,9.109-7.137a1.819,1.819,0,0,1,1.9-.256c96.229,43.917,200.41,43.917,295.5,0a1.812,1.812,0,0,1,1.924.233c2.944,2.426,6.027,4.851,9.132,7.16a1.884,1.884,0,0,1-.162,3.126,301.407,301.407,0,0,1-45.89,21.83,1.875,1.875,0,0,0-1,2.611,391.055,391.055,0,0,0,30.014,48.815,1.864,1.864,0,0,0,2.063.7A486.048,486.048,0,0,0,610.7,405.729a1.882,1.882,0,0,0,.765-1.352C623.729,277.594,590.933,167.465,524.531,69.836ZM222.491,337.58c-28.972,0-52.844-26.587-52.844-59.239S193.056,219.1,222.491,219.1c29.665,0,53.306,26.82,52.843,59.239C275.334,310.993,251.924,337.58,222.491,337.58Zm195.38,0c-28.971,0-52.843-26.587-52.843-59.239S388.437,219.1,417.871,219.1c29.667,0,53.307,26.82,52.844,59.239C470.715,310.993,447.538,337.58,417.871,337.58Z"/></svg></a>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </main>
 
     <!-- Footer -->
-    <footer class="py-10">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <div>
-                    <a href="/" class="logo" style="font-size:1.3rem;">Isabella<span>.</span></a>
-                    <p style="color:var(--t3);font-size:0.75rem;margin-top:0.25rem;">
-                        © <script>document.write(new Date().getFullYear())</script> Isabella. Built with 💖
-                    </p>
-                </div>
-                <div class="flex items-center gap-5">
-                    <a href="./imprint">Imprint</a>
-                    <a href="/">Home</a>
-                    <a href="./sources">Sources</a>
-                </div>
-            </div>
+    <footer class="footer-strip py-10 px-6">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+          <a href="/" class="logo" style="font-size: 1.1rem">Isabella<em>.</em></a>
+          <p class="text-xs mt-1" style="color: var(--text-3)">
+            © <span id="current-year"></span> Isabella. Built with 💖
+          </p>
         </div>
+        <div class="flex items-center gap-5">
+          <a href="./imprint">Imprint</a>
+          <a href="/">Home</a>
+          <a href="./sources">Sources</a>
+        </div>
+      </div>
     </footer>
 
     <script>
-        // Scroll reveal
-        const revealObserver = new IntersectionObserver(entries => {
-            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); } });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+      const navStrip = document.getElementById("nav-strip");
+      window.addEventListener("scroll", () => navStrip.classList.toggle("is-scrolled", window.scrollY > 40));
+
+      const mobileBtn = document.getElementById("mobile-menu-button");
+      const mobileMenu = document.getElementById("mobile-menu");
+      mobileBtn.addEventListener("click", () => {
+        mobileMenu.classList.toggle("is-open");
+        mobileBtn.setAttribute("aria-expanded", mobileMenu.classList.contains("is-open"));
+        const icon = mobileBtn.querySelector(".mobile-menu-icon");
+        icon.setAttribute("d", mobileMenu.classList.contains("is-open") ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16");
+      });
+      document.querySelectorAll(".nav-link").forEach((l) =>
+        l.addEventListener("click", () => {
+          mobileMenu.classList.remove("is-open");
+          mobileBtn.setAttribute("aria-expanded", "false");
+          mobileBtn.querySelector(".mobile-menu-icon").setAttribute("d", "M4 6h16M4 12h16M4 18h16");
+        }),
+      );
+
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("is-visible");
+              revealObserver.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.1 },
+      );
+      document.querySelectorAll(".reveal").forEach((el) => revealObserver.observe(el));
+
+      document.getElementById("current-year").textContent = new Date().getFullYear();
     </script>
-</body>
+  </body>
 </html>
