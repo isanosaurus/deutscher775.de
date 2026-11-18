@@ -255,6 +255,12 @@
   .mt-16 {
     margin-top: calc(var(--spacing) * 16);
   }
+  .mt-24 {
+    margin-top: calc(var(--spacing) * 24);
+  }
+  .mt-auto {
+    margin-top: auto;
+  }
   .mb-0 {
     margin-bottom: calc(var(--spacing) * 0);
   }
@@ -396,6 +402,9 @@
   .gap-16 {
     gap: calc(var(--spacing) * 16);
   }
+  .gap-24 {
+    gap: calc(var(--spacing) * 24);
+  }
   .space-y-1 {
     :where(& > :not(:last-child)) {
       --tw-space-y-reverse: 0;
@@ -462,6 +471,9 @@
   .p-4 {
     padding: calc(var(--spacing) * 4);
   }
+  .p-7 {
+    padding: calc(var(--spacing) * 7);
+  }
   .p-8 {
     padding: calc(var(--spacing) * 8);
   }
@@ -482,6 +494,9 @@
   }
   .py-28 {
     padding-block: calc(var(--spacing) * 28);
+  }
+  .pt-1 {
+    padding-top: calc(var(--spacing) * 1);
   }
   .pt-6 {
     padding-top: calc(var(--spacing) * 6);
@@ -1473,6 +1488,184 @@ a:hover {
 }
 .section-row .doc-title {
   margin-bottom: 0;
+}
+.mnc-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+}
+@media (max-width: 640px) {
+  .mnc-intro {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .mnc-intro h1 {
+    font-size: min(8vw, 2.1rem);
+  }
+}
+.app-tile {
+  width: 96px;
+  height: 96px;
+  flex-shrink: 0;
+  padding: 12px;
+  background: var(--text-1);
+  border-radius: var(--radius);
+}
+.app-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--text-1);
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 28px;
+  font-size: 0.9rem;
+  color: var(--text-2);
+  cursor: pointer;
+}
+.check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent-fill);
+  cursor: pointer;
+}
+.moodle-mock {
+  overflow: hidden;
+}
+.moodle-bar {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  padding: 0.85rem 1.4rem;
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--seam);
+  font-size: 0.85rem;
+  color: var(--text-3);
+}
+.moodle-user {
+  margin-left: auto;
+  color: var(--text-1);
+  font-weight: 600;
+  text-align: right;
+}
+.moodle-body {
+  padding: 1.5rem 1.4rem;
+}
+.moodle-greet {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 1.25rem;
+}
+.moodle-body li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.85rem 0;
+  font-size: 0.95rem;
+  color: var(--text-1);
+}
+.moodle-body li + li {
+  border-top: 1px solid var(--seam);
+}
+.moodle-kicker {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+mark.swap {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 0 0.2em;
+}
+.install-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.75rem;
+}
+.install-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-1);
+}
+.install-sub {
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--text-3);
+}
+.steps {
+  counter-reset: step;
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.steps li {
+  counter-increment: step;
+  position: relative;
+  min-height: 28px;
+  padding-left: 2.6rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: -2px;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.steps .name {
+  color: var(--text-1);
+  font-weight: 600;
+}
+.install-note {
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-3);
+}
+.copy-chip {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--text-1);
+  background: var(--panel-2);
+  border: 1px solid var(--seam);
+  border-radius: var(--radius-sm);
+  padding: 0.1em 0.45em;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.copy-chip:hover {
+  border-color: var(--seam-lit);
+}
+.copy-chip.is-copied {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.copy-chip.is-copied::after {
+  content: " ✓";
 }
 @media (pointer: coarse) {
   .footer-strip a, .sources-nav a, .info-list a.value, .doc-block .contact-link {
